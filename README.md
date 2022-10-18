@@ -33,3 +33,21 @@ cd /icnea/
 cp data_tools.yaml /usr/src/app/data/
 
 ```
+
+
+EXTRAS: MANEJANDO DOCKER
+
+Para iniciar un contenedor creado
+
+```bash
+sudo docker start icnea_yolov5
+
+```
+
+Luego ejecutar el docker y usar bash dentro del mismo
+
+
+```bash
+sudo docker excec -it icnea_yolov5 bash
+
+```
