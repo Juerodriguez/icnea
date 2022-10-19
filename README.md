@@ -48,6 +48,6 @@ Luego ejecutar el docker y usar bash dentro del mismo
 
 
 ```bash
-sudo docker excec -it icnea_yolov5 bash
+sudo docker exec -it icnea_yolov5 bash
 
 ```
