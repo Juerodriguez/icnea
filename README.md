@@ -34,6 +34,12 @@ cp data_tools.yaml /usr/src/app/data/
 
 ```
 
+Descargar el premodelo que vas a entrenar y moverlo a /usr/src/app/ ;Seleccionarlo desde https://github.com/ultralytics/yolov5#pretrained-checkpoints
+
+```bash
+python train.py --img 640 --batch 8 --epochs <cantidad de epochs ej:20> --data data/data_tools.yaml --weights <modelo a entrenar ej:yolov5m.pt> 
+
+```
 
 EXTRAS: MANEJANDO DOCKER
 
@@ -51,3 +57,8 @@ Luego ejecutar el docker y usar bash dentro del mismo
 sudo docker exec -it icnea_yolov5 bash
 
 ```
+
+
+
+
+python train.py --img 640 --batch 8 --epochs 20 --data data/data_tools.yaml --weights yolov5m.pt 
