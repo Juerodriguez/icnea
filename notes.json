@@ -1,0 +1,37 @@
+{
+  "categories": [
+    {
+      "id": 0,
+      "name": "Coping saw"
+    },
+    {
+      "id": 1,
+      "name": "Drill"
+    },
+    {
+      "id": 2,
+      "name": "Hammer"
+    },
+    {
+      "id": 3,
+      "name": "Pliers"
+    },
+    {
+      "id": 4,
+      "name": "Scissors"
+    },
+    {
+      "id": 5,
+      "name": "Screwdriver"
+    },
+    {
+      "id": 6,
+      "name": "Spanner"
+    }
+  ],
+  "info": {
+    "year": 2022,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}
