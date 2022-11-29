@@ -91,18 +91,16 @@ def post_process(input_image, outputs):
 
 
 # Serving model
-if __name__ == '__main__':
+def inference(model, image):
     # TODO: Load class names.
-    classesFile = "coco.names"
+    classesfile = "coco.names"
     classes = None
-    with open(classesFile, 'rt') as f:
+    with open(classesfile, 'rt') as f:
           classes = f.read().rstrip('\n').split('\n')
-    # TODO: Load VIDEO RSTP.
-    cap = cv2.VideoCapture(0)
-    frame = cap.read()
-    # Give the weight files to the model and load the network using       them.
-    modelWeights = "YOLOv5s.onnx"
-    net = cv2.dnn.readNet(modelWeights)
+    # -----------------------------------------------------------
+    frame = image
+    modelweights = model
+    net = cv2.dnn.readNet(modelweights)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
     # Process image.
@@ -114,7 +112,9 @@ if __name__ == '__main__':
     """
     t, _ = net.getPerfProfile()
     label = 'Inference time: %.2f ms' % (t * 1000.0 /  cv2.getTickFrequency())
-    print(label)
     cv2.putText(img, label, (20, 40), FONT_FACE, FONT_SCALE,  (0, 0, 255), THICKNESS, cv2.LINE_AA)
+    # TODO: CLEAN imshow
     cv2.imshow('Output', img)
+    # TODO: SEE WHAT IS WAITKEY
     cv2.waitKey(0)
+    return img
