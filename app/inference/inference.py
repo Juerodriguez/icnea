@@ -42,7 +42,7 @@ def pre_process(input_image, net):
     return outputs
 
 
-def post_process(input_image, outputs):
+def post_process(input_image, outputs, classes):
     # Lists to hold respective values while unwrapping.
     class_ids = []
     confidences = []
@@ -93,10 +93,9 @@ def post_process(input_image, outputs):
 # Serving model
 def inference(model, image):
     # TODO: Load class names.
-    classesfile = "coco.names"
-    classes = None
+    classesfile = "classes.txt"
     with open(classesfile, 'rt') as f:
-          classes = f.read().rstrip('\n').split('\n')
+        classes = f.read().rstrip('\n').split('\n')
     # -----------------------------------------------------------
     frame = image
     modelweights = model
@@ -105,7 +104,7 @@ def inference(model, image):
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
     # Process image.
     detections = pre_process(frame, net)
-    img = post_process(frame.copy(), detections)
+    img = post_process(frame.copy(), detections, classes)
     """
     Put efficiency information. The function getPerfProfile returns       the overall time for inference(t) 
     and the timings for each of the layers(in layersTimes).
@@ -114,7 +113,7 @@ def inference(model, image):
     label = 'Inference time: %.2f ms' % (t * 1000.0 /  cv2.getTickFrequency())
     cv2.putText(img, label, (20, 40), FONT_FACE, FONT_SCALE,  (0, 0, 255), THICKNESS, cv2.LINE_AA)
     # TODO: CLEAN imshow
-    cv2.imshow('Output', img)
+    # cv2.imshow('Output', img)
     # TODO: SEE WHAT IS WAITKEY
-    cv2.waitKey(0)
+    # cv2.waitKey(0)
     return img
