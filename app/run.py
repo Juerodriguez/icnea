@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI
 from inference import inference
 from fastapi.responses import StreamingResponse
-
+import config
 
 app = FastAPI()
 
@@ -22,7 +22,7 @@ def get_image():
     cap = cv2.VideoCapture(0)
     while True:
         frame = cap.read()
-        model = "YOLOv5s.onnx"
+        model = f"{config.MODEL_PATH}YOLOv5s.onnx"  # Cambiar al nombre del modelo que quiere probar
         output = inference.inference(model, frame)
         # asyncio.create_task(generate_remaining_models(model, frame))
         if output is None:
