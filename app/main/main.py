@@ -1,11 +1,11 @@
 import cv2
 import uvicorn
-from fastapi import FastAPI
+from fastapi import APIRouter
 from inference import inference
 from fastapi.responses import StreamingResponse
 import config
 
-app = FastAPI()
+app = APIRouter()
 
 
 @app.get("/")
@@ -32,6 +32,3 @@ def get_image():
                     bytearray(encodedImage) + b'\r\n')
         return response
 
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080)
