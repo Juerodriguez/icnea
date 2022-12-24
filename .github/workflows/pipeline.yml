@@ -38,6 +38,7 @@ jobs:
       run: |
         pytest --cov app/main/
 
+  tests-cov:
     - name: Generate Report
       run: |
         coverage run --source=app/main -m unittest discover app/test
