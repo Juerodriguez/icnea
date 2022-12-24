@@ -14,7 +14,7 @@ del mismo se encuentran en:
 
 La aplicacion de inferencia fue desarrollada con FastApi devido a su grado de integracion con operacion asincronas.
 
-Python 3.10
+![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)
 
 Instalar los requerimientos
 ```
