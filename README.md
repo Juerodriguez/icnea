@@ -1,4 +1,5 @@
 # ICNEA
+[![codecov](https://codecov.io/gh/Juerodriguez/icnea/branch/master/graph/badge.svg?token=CS77QAL0ZB)](https://codecov.io/gh/Juerodriguez/icnea)
 
 Icnea como todo proyecto de ML esta compuesto por dos etapas, una etapa de entrenamiento donde se construye el
 modelo, y otra etapa de inferencia donde se pone a prueba el modelo
