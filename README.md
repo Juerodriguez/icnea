@@ -27,9 +27,4 @@ Correr el programa
 uvicorn run:app --reload
 ```
 
-Optimizador AdamW
-```
-python train.py --img 640 --batch 8 --epochs 80 --optimizer AdamW --data data/data_tools.yaml --weights yolov5m.pt --cache disk
-```
-
 

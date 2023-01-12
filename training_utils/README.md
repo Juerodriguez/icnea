@@ -56,10 +56,15 @@ python train.py --img 640 --batch 8 --epochs <cantidad de epochs ej:20> --data d
 Luego de entrenarlo Validarlo
 
 ```bash
-python val.py --weights runs/train/exp16/weights/best.pt --data data/data_tools.yaml --batch 8 --img 640 --half
+python val.py --weights runs/train/<n° de experimento>/weights/best.pt --data data/data_tools.yaml --batch 8 --img 640 --half
 
 ```
+Por ultimo, cuando tengamos nuestro mejor modelo entrenado lo transformaremos en el formato ONNX para asi poder utilizarlo en la inferencia.
+Esto lo haremos con el script export.py
 
+```bash
+python export.py --weights runs/<n° de experimento>/weights/best.pt --include onnx
+```
 
 ## EXTRAS: MANEJANDO DOCKER
 
