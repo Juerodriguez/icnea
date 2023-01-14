@@ -1,6 +1,6 @@
 from app.main import create_app
-from app.main.routes import router
-import os
+from icnea.app.main.router.stream_routes import router
 
-app = create_app(os.getenv("FASTAPI_ENV", "dev"))
+
+app = create_app()
 app.include_router(router)

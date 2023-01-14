@@ -1,8 +1,8 @@
 import cv2
 from fastapi import APIRouter
-from .inference import inference
+from icnea.app.main.services import inference
 from fastapi.responses import StreamingResponse
-from .config import MODEL_PATH
+from icnea.app.main.config import Settings
 
 router = APIRouter()
 
@@ -21,7 +21,7 @@ def get_image():
     cap = cv2.VideoCapture(0)
     while True:
         frame = cap.read()
-        model = f"{MODEL_PATH}YOLOv5s.onnx"  # Cambiar al nombre del modelo que quiere probar
+        model = f"{Settings.MODEL_PATH}best.onnx"  # Cambiar al nombre del modelo que quiere probar
         output = inference.inference(model, frame)
         # asyncio.create_task(generate_remaining_models(model, frame))
         if output is None:

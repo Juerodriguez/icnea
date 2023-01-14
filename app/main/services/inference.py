@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from icnea.app.main.config import Settings
 
 # Constants.
 INPUT_WIDTH = 640
@@ -93,7 +94,7 @@ def post_process(input_image, outputs, classes):
 # Serving model
 def inference(model, image):
     # TODO: Load class names.
-    classesfile = "classes.txt"
+    classesfile = Settings.CLASSES_PATH
     with open(classesfile, 'rt') as f:
         classes = f.read().rstrip('\n').split('\n')
     # -----------------------------------------------------------
@@ -106,7 +107,7 @@ def inference(model, image):
     detections = pre_process(frame, net)
     img = post_process(frame.copy(), detections, classes)
     """
-    Put efficiency information. The function getPerfProfile returns       the overall time for inference(t) 
+    Put efficiency information. The function getPerfProfile returns       the overall time for services(t) 
     and the timings for each of the layers(in layersTimes).
     """
     t, _ = net.getPerfProfile()
