@@ -1,5 +1,5 @@
 from app.main import create_app
-from icnea.app.main.router.stream_routes import router
+from app.main.router.stream_routes import router
 
 
 app = create_app()

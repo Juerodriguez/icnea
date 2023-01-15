@@ -1,5 +1,9 @@
 from pydantic import BaseSettings, BaseModel
 import cv2
+import os
+
+
+BASE_PATH = os.getcwd()
 
 
 class Colors(BaseModel):
@@ -23,14 +27,15 @@ class Constants(BaseModel):
 
 
 class OpenCV2Config(BaseModel):
-    COLORS: Colors
-    TEXT_PARAMETERS: Text
-    CONSTANTS: Constants
+    COLORS: Colors = Colors()
+    TEXT_PARAMETERS: Text = Text()
+    CONSTANTS: Constants = Constants()
 
 
 class Settings(BaseSettings):
-    MODEL_PATH: str = "./models/"
-    CLASSES_PATH: str = "classes.txt"
-    OPENCVCONFIG: OpenCV2Config
+    MODEL_PATH: str = os.path.abspath("app/models/")
+    CLASSES_PATH: str = os.path.abspath("classes.txt")
+    TEMPLATE_PATH: str = os.path.abspath("app/templates/")
+    OPENCVCONFIG: OpenCV2Config = OpenCV2Config()
 
 
