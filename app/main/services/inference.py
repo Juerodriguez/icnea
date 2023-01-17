@@ -20,20 +20,34 @@ BLUE = (255, 178, 50)
 YELLOW = (0, 255, 255)
 
 
+settings = Settings()
+
+
 def draw_label(im, label, x, y):
     """Draw text onto image at location."""
     # Get text size.
-    text_size = cv2.getTextSize(label, FONT_FACE, FONT_SCALE, THICKNESS)
+    text_size = cv2.getTextSize(label,
+                                settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_FACE,
+                                settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_SCALE,
+                                settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS)
     dim, baseline = text_size[0], text_size[1]
     # Use text size to create a BLACK rectangle.
     cv2.rectangle(im, (x, y), (x + dim[0], y + dim[1] + baseline), (0,0,0), cv2.FILLED)
     # Display text inside the rectangle.
-    cv2.putText(im, label, (x, y + dim[1]), FONT_FACE, FONT_SCALE, YELLOW, THICKNESS, cv2.LINE_AA)
+    cv2.putText(im, label, (x, y + dim[1]),
+                settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_FACE,
+                settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_SCALE,
+                settings.OPENCVCONFIG.COLORS.YELLOW,
+                settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS,
+                cv2.LINE_AA)
 
 
 def pre_process(input_image, net):
     # Create a 4D blob from a frame.
-    blob = cv2.dnn.blobFromImage(input_image, 1 / 255, (INPUT_WIDTH, INPUT_HEIGHT), [0, 0, 0], 1, crop=False)
+    blob = cv2.dnn.blobFromImage(input_image, 1 / 255,
+                                 (settings.OPENCVCONFIG.CONSTANTS.INPUT_WIDTH,
+                                  settings.OPENCVCONFIG.CONSTANTS.INPUT_HEIGHT),
+                                 [0, 0, 0], 1, crop=False)
 
     # Sets the input to the network.
     net.setInput(blob)
@@ -94,13 +108,12 @@ def post_process(input_image, outputs, classes):
 # Serving model
 def inference(model, image):
     # TODO: Load class names.
-    classesfile = Settings.CLASSES_PATH
+    classesfile = settings.CLASSES_PATH
     with open(classesfile, 'rt') as f:
         classes = f.read().rstrip('\n').split('\n')
     # -----------------------------------------------------------
     frame = image
-    modelweights = model
-    net = cv2.dnn.readNet(modelweights)
+    net = cv2.dnn.readNetFromONNX(model)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
     # Process image.
