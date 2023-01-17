@@ -15,7 +15,7 @@ Este script divide los datos de images y labels en datos para el train y validat
 3- Docker Container
 
 ```bash
-sudo docker pull ultralytics/yolov5:v6.2
+sudo docker pull ultralytics/yolov5:v6.2 
 
 ```
 
