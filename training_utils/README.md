@@ -15,14 +15,14 @@ Este script divide los datos de images y labels en datos para el train y validat
 3- Docker Container
 
 ```bash
-sudo docker pull ultralytics/yolov5:latest
+sudo docker pull ultralytics/yolov5:v6.2
 
 ```
 
 En la misma ruta del repositorio crear el contenedor, debe ser aqui por el comando PWD que lo creara donde este posicionada la linea de comando.
 
 ```bash
-sudo docker run --name icnea_yolov5 -it -v $PWD:/icnea --gpus all --shm-size=8gb ultralytics/yolov5:latest
+sudo docker run --name icnea_yolov5 -it -v $PWD:/icnea --gpus all --shm-size=8gb ultralytics/yolov5:v6.2
 
 ```
 
