@@ -6,7 +6,7 @@ from ..config import Settings
 from fastapi.templating import Jinja2Templates
 
 config = Settings()
-router = APIRouter()
+router = APIRouter(prefix="/stream", tags=["Video Stream"])
 templates = Jinja2Templates(directory=config.TEMPLATE_PATH)
 
 
@@ -17,7 +17,7 @@ def read_root(request: Request):
     })
 
 
-@router.get("/video_stream")
+@router.get("/get_video")
 async def video_stream():
     return StreamingResponse(get_image(), media_type="multipart/x-mixed-replace;boundary=frame")
 
