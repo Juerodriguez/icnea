@@ -1,64 +1,68 @@
-# ICNEA
+# Entrenamiento
 
-1- Descomprimir el zip en el repositorio
+## Preparación de las imágenes ha etiquetar
+Antes de realizar el entrenamiento, se debe conseguir las imagenes con los objetos que queremos detectar (por lo menos 500 imágenes por objeto). Luego, para poder hacer un etiquetado de forma mas comoda y legible, se recomienda ejecutar el script "rename_images.py" para renombrar las imagenes y obtener nombres cortos con nombre. Para esto se debe copiar y pegar el script mencionado a la altura del directorio que ocntiene las imagenes y luego ejecutarlo:
 
-2- Correr el script split_data.py
+```bash
+python3 rename_images.py
+```
 
+## Preparación del dataset
+Luego de realizar el correspondiente etiquetado de las imagenes y luego de exportar el .zip para YOLO:
+
+1- Descomprimir el .zip en el repositorio u otra carpeta determinada
+
+2- copiar el script "split_data.py" en la carpeta descomprimida
+
+3- Correr el script split_data.py:
 
 ```bash
 python3 split_data.py
 ```
-
 Este script divide los datos de images y labels en datos para el train y validation con una proporcion de 80/20
 
-
-3- Docker Container
+3- Descargar la imagen de yolo-v5 para Docker:
 
 ```bash
 sudo docker pull ultralytics/yolov5:v6.2 
-
 ```
 
-En la misma ruta del repositorio crear el contenedor, debe ser aqui por el comando PWD que lo creara donde este posicionada la linea de comando.
+4- En la misma ruta del repositorio crear el contenedor. Debe ser aqui por el comando PWD que lo creara donde este posicionada la linea de comando:
 
 ```bash
 sudo docker run --name icnea_yolov5 -it -v $PWD:/icnea --gpus all --shm-size=8gb ultralytics/yolov5:v6.2
-
 ```
+Gracias al comando "-v" se comparte el directorio con las etiquetas, con el contenedor de yolo-v5
 
-Mover el archivo data_tools.yaml al directorio de yolov5 dentro del contenedor en /usr/src/app/data
-
+5- Mover el archivo data_tools.yaml al directorio de yolov5 dentro del contenedor en /usr/src/app/data
 ```bash
 cd /icnea/
 cp data_tools.yaml /usr/src/app/data/
-
 ```
 
-Descargar el premodelo que vas a entrenar y moverlo a /usr/src/app/
-Seleccionarlo desde https://github.com/ultralytics/yolov5#pretrained-checkpoints
-Mover el .pt descargado a la carpeta /usr/src/app/
+6- Descargar el premodelo que vas a entrenar desde https://github.com/ultralytics/yolov5#pretrained-checkpoints
 
-```
+7- Mover el .pt descargado a la carpeta /usr/src/app/
+```bash
 cp <modelo a entrenar ej:yolov5m.pt> /usr/src/app/
 ```
 
-Para iniciar el entrenamiento se usa el siguiente comando que tiene un batch de 8. Primero nos movemos a la carpeta donde está el .pt
-```
+8- Para iniciar el entrenamiento se usa el siguiente comando que tiene un batch de 8. Primero nos movemos a la carpeta donde está el .pt
+```bash
 cd /usr/src/app/
 ```
-Luego ejecutamos el los siguientes comandos:
+9- Luego ejecutamos el los siguientes comandos:
 ```bash
 export CLEAR_OFFLINE_MODE=1
 python train.py --img 640 --batch 8 --epochs <cantidad de epochs ej:20> --data data/data_tools.yaml --weights <modelo a entrenar ej:yolov5m.pt> 
-
 ```
 
-Luego de entrenarlo Validarlo
-
+10- Luego de entrenarlo Validarlo
 ```bash
 python val.py --weights runs/train/<n° de experimento>/weights/best.pt --data data/data_tools.yaml --batch 8 --img 640 --half
 
 ```
+
 Por ultimo, cuando tengamos nuestro mejor modelo entrenado lo transformaremos en el formato ONNX para asi poder utilizarlo en la inferencia.
 Esto lo haremos con el script export.py
 
@@ -66,24 +70,21 @@ Esto lo haremos con el script export.py
 python export.py --weights runs/<n° de experimento>/weights/best.pt --include onnx
 ```
 
-## EXTRAS: MANEJANDO DOCKER
+## Manejando docker
 
 Para iniciar un contenedor creado
-
 ```bash
 sudo docker start icnea_yolov5
 
 ```
 
 Luego ejecutar el docker y usar bash dentro del mismo
-
-
 ```bash
 sudo docker exec -it icnea_yolov5 bash
 
 ```
 
-## EXPERIMENTOS CON OPTIMIZADORES
+## Ejemplos de experimentos con distintos optimizadores
 
 Para lograr una comparación entre los distintos optimizadores ejecutar:
 
@@ -101,5 +102,3 @@ Optimizador AdamW
 ```
 python train.py --img 640 --batch 8 --epochs 80 --optimizer AdamW --data data/data_tools.yaml --weights yolov5m.pt --cache disk
 ```
-
-
