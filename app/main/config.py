@@ -3,9 +3,6 @@ import cv2
 import os
 
 
-BASE_PATH = os.getcwd()
-
-
 class Colors(BaseModel):
     BLACK = (0, 0, 0)
     BLUE = (255, 178, 50)
