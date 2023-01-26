@@ -97,7 +97,14 @@ def post_process(input_image, outputs, classes):
 
 # Serving model
 def inference(model, image):
-    # TODO: Load class names.
+    """
+    This function should process the frame taken two arguments, model and image, so with this predict the objects
+    inside.
+
+    :param model:
+    :param image:
+    :return: frame with prediction
+    """
     classesfile = settings.CLASSES_PATH
     with open(classesfile, 'rt') as f:
         classes = f.read().rstrip('\n').split('\n')
@@ -106,20 +113,13 @@ def inference(model, image):
     net = cv2.dnn.readNetFromONNX(model)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-    # Process image.
+    # Process Image.
     detections = pre_process(frame, net)
     img = post_process(frame.copy(), detections, classes)
-    """
-    Put efficiency information. The function getPerfProfile returns       the overall time for services(t) 
-    and the timings for each of the layers(in layersTimes).
-    """
+    # Get performance about each object predicted and show it inside.
     t, _ = net.getPerfProfile()
     label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
     cv2.putText(img, label, (20, 40), settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_FACE,
                 settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_SCALE,
                 (0, 0, 255), settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS, cv2.LINE_AA)
-    # TODO: CLEAN imshow
-    # cv2.imshow('Output', img)
-    # TODO: SEE WHAT IS WAITKEY
-    # cv2.waitKey(0)
     return img
