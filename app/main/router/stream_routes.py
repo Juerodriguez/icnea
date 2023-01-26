@@ -17,16 +17,16 @@ def read_root(request: Request):
     })
 
 
-@router.get("/get_video")
+@router.get("/get_video", response_class=StreamingResponse)
 async def video_stream():
     return StreamingResponse(get_image(), media_type="multipart/x-mixed-replace;boundary=frame")
 
 
 def get_image():
     cap = cv2.VideoCapture("/home/stylorj/PycharmProjects/JUGO/icneaproject/icnea/prueba2.mp4")
+    model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
     while True:
         ret, frame = cap.read()
-        model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
         output = inference.inference(model, frame)
         # asyncio.create_task(generate_remaining_models(model, frame))
         if output is None:
