@@ -6,7 +6,7 @@ import time
 settings = Settings()
 
 
-def draw_label(im, label, x, y): #Se puede convertir en proceso asincrono
+def draw_label(im, label, x, y):
     """Draw text onto image at location."""
     # Get text size.
     text_size = cv2.getTextSize(label,
@@ -92,7 +92,7 @@ def post_process(input_image, outputs, classes):
 
 
 # Serving model
-def inference(net, frame, classes):
+async def inference(net, frame, classes):
     """
     This function should process the frame taken two arguments, net who is the model and image, so with this predict
     the objects inside.
