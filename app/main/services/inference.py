@@ -6,7 +6,7 @@ import time
 settings = Settings()
 
 
-def draw_label(im, label, x, y):
+def draw_label(im, label, x, y): #Se puede convertir en proceso asincrono
     """Draw text onto image at location."""
     # Get text size.
     text_size = cv2.getTextSize(label,
@@ -34,12 +34,8 @@ def pre_process(input_image, net):
 
     # Sets the input to the network.
     net.setInput(blob)
-
     # Run the forward pass to get output of the output layers.
-    inicio = time.time()
     outputs = net.forward(net.getUnconnectedOutLayersNames())
-    fin = time.time()
-    print(fin-inicio)
     return outputs
 
 
@@ -96,23 +92,17 @@ def post_process(input_image, outputs, classes):
 
 
 # Serving model
-def inference(model, image):
+def inference(net, frame, classes):
     """
-    This function should process the frame taken two arguments, model and image, so with this predict the objects
-    inside.
+    This function should process the frame taken two arguments, net who is the model and image, so with this predict
+    the objects inside.
 
-    :param model:
-    :param image:
+    :param net:
+    :param frame:
+    :param classes:
     :return: frame with prediction
     """
-    classesfile = settings.CLASSES_PATH
-    with open(classesfile, 'rt') as f:
-        classes = f.read().rstrip('\n').split('\n')
     # -----------------------------------------------------------
-    frame = image
-    net = cv2.dnn.readNetFromONNX(model)
-    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
     # Process Image.
     detections = pre_process(frame, net)
     img = post_process(frame.copy(), detections, classes)
