@@ -6,11 +6,13 @@ val: images/val/
 
 
 # class names
-names: 
-  0: Coping saw
-  1: Drill
-  2: Hammer
-  3: Pliers
-  4: Scissors
-  5: Screwdriver
-  6: Spanner
+names:
+  0: Box
+  1: Coping saw
+  2: Drill
+  3: Hammer
+  4: Pliers
+  5: Scissors
+  6: Screwdriver
+  7: Spanner
+  8: Worker

@@ -27,7 +27,7 @@ Este script divide los datos de images y labels en datos para el train y validat
 sudo docker pull ultralytics/yolov5:v6.2 
 ```
 
-4- En la misma ruta del repositorio crear el contenedor. Debe ser aqui por el comando PWD que lo creara donde este posicionada la linea de comando:
+4- En la misma ruta del repositorio o directorio con los datos, crear el contenedor. Debe ser aqui por el comando PWD que lo creara donde este posicionada la linea de comando:
 
 ```bash
 sudo docker run --name icnea_yolov5 -it -v $PWD:/icnea --gpus all --shm-size=8gb ultralytics/yolov5:v6.2
@@ -40,7 +40,7 @@ cd /icnea/
 cp data_tools.yaml /usr/src/app/data/
 ```
 
-6- Descargar el premodelo que vas a entrenar desde https://github.com/ultralytics/yolov5#pretrained-checkpoints
+6- Descargar el premodelo que vas a entrenar desde https://github.com/ultralytics/yolov5#pretrained-checkpoints y luego colocarlo en la carpeta compartida con el contenedor docker creado.
 
 7- Mover el .pt descargado a la carpeta /usr/src/app/
 ```bash
@@ -51,13 +51,13 @@ cp <modelo a entrenar ej:yolov5m.pt> /usr/src/app/
 ```bash
 cd /usr/src/app/
 ```
-9- Luego ejecutamos el los siguientes comandos:
+Luego ejecutamos el los siguientes comandos:
 ```bash
 export CLEAR_OFFLINE_MODE=1
 python train.py --img 640 --batch 8 --epochs <cantidad de epochs ej:20> --data data/data_tools.yaml --weights <modelo a entrenar ej:yolov5m.pt> 
 ```
 
-10- Luego de entrenarlo Validarlo
+9- Luego de entrenarlo Validarlo
 ```bash
 python val.py --weights runs/train/<n° de experimento>/weights/best.pt --data data/data_tools.yaml --batch 8 --img 640 --half
 
