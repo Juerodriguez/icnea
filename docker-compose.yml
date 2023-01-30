@@ -1,0 +1,15 @@
+version: "2"
+services:
+  api:
+    build: .
+    container_name: icnea-server
+    command: uvicorn run:app --host 0.0.0.0 --port 80 --reload
+    ports:
+      - 80:80
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
