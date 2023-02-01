@@ -1,13 +1,23 @@
 import cv2
 import numpy as np
 from ..config import Settings
+from ..schemas.prediction_schema import Frame, Coordinate, Prediction
+from ..services.redis_client import save_cache
 import time
 
 settings = Settings()
 
 
 def draw_label(im, label, x, y):
-    """Draw text onto image at location."""
+    """
+    Draw text onto image at location.
+
+    :param im:
+    :param label:
+    :param x:
+    :param y:
+    :return:
+    """
     # Get text size.
     text_size = cv2.getTextSize(label,
                                 settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_FACE,
@@ -26,6 +36,13 @@ def draw_label(im, label, x, y):
 
 
 def pre_process(input_image, net):
+    """
+    This function run the inference in the image with the models.
+
+    :param input_image:
+    :param net:
+    :return: output raw predictions
+    """
     # Create a 4D blob from a frame.
     blob = cv2.dnn.blobFromImage(input_image, 1 / 255,
                                  (settings.OPENCVCONFIG.CONSTANTS.INPUT_WIDTH,
@@ -40,6 +57,15 @@ def pre_process(input_image, net):
 
 
 def post_process(input_image, outputs, classes):
+    """
+    This function post process the predictions, it discards redundant and bad detections,
+     then draw the boxes and labels, finally, at last save results in cache.
+
+    :param input_image:
+    :param outputs:
+    :param classes:
+    :return:
+    """
     # Lists to hold respective values while unwrapping.
     class_ids = []
     confidences = []
@@ -74,12 +100,14 @@ def post_process(input_image, outputs, classes):
     indices = cv2.dnn.NMSBoxes(boxes, confidences,
                                settings.OPENCVCONFIG.CONSTANTS.CONFIDENCE_THRESHOLD,
                                settings.OPENCVCONFIG.CONSTANTS.NMS_THRESHOLD)
+    frame = []
     for i in indices:
         box = boxes[i]
         left = box[0]
         top = box[1]
         width = box[2]
         height = box[3]
+
         # Draw bounding box.
         cv2.rectangle(input_image, (left, top), (left + width, top + height),
                       settings.OPENCVCONFIG.COLORS.BLUE,
@@ -88,6 +116,10 @@ def post_process(input_image, outputs, classes):
         label = "{}:{:.2f}".format(classes[class_ids[i]], confidences[i])
         # Draw label.
         draw_label(input_image, label, left, top)
+        coordinate = Coordinate(left=left, top=top, width=width, height=height)
+        singular_frame = Frame(coordinate=coordinate, label=label)
+        frame.append(singular_frame.dict())
+    save_cache(Prediction(frame=frame))
     return input_image
 
 

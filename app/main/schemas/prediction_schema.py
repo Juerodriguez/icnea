@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import List
 from uuid import uuid4
 
 
@@ -7,13 +8,19 @@ def generate_uuid():
 
 
 class Coordinate(BaseModel):
-    left: int
-    top: int
-    width: int
-    height: int
+    left: int = None
+    top: int = None
+    width: int = None
+    height: int = None
+
+
+class Frame(BaseModel):
+    coordinate: Coordinate = Coordinate()
+    label: str = None
 
 
 class Prediction(BaseModel):
     id: str = Field(default_factory=generate_uuid)
-    coordinate: Coordinate = Coordinate()
-    label: str
+    frame: List[Frame]
+
+
