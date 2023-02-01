@@ -1,33 +1,31 @@
+import json
 import redis
 from redis.exceptions import ResponseError
+from ..schemas.prediction_schema import Prediction
 
-redis_client = redis.Redis(host=redis, port=6379)
+
+redis_client = redis.Redis(host="redis", port=6379)
 
 
-def save_hash(key: str, data: dict):
+def save_cache(data: Prediction) -> str:
     try:
-        redis_client.hset(name=key, mapping=data)
+        redis_client.set(data.dict()["id"], json.dumps(data.dict()))
+        return "Guardado con exito"
     except ResponseError as e:
         print(e)
 
 
-def get_hash(key: str):
+def delete_all_cache() -> str:
     try:
-        redis_client.hgetall(name=key)
+        keys_iter = (redis_client.delete(key) for key in redis_client.keys())
+        return "Borrado con exito"
     except ResponseError as e:
         print(e)
 
 
-def delete_hash(key: str, keys: list):
+def get_all_cache() -> iter:
     try:
-        redis_client.hdel(key, *keys)
-    except ResponseError as e:
-        print(e)
-
-
-def get_all():
-    try:
-        keys = redis_client.keys("*")
-        redis_client.hgetall(name=keys)
+        keys_iter = (json.loads(redis_client.get(key)) for key in redis_client.keys())
+        return keys_iter
     except ResponseError as e:
         print(e)
