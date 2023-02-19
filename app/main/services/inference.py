@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import asyncio
 from ..config import Settings
 from ..schemas.prediction_schema import Frame, Coordinate, Prediction
 from ..services.redis_client import save_cache
@@ -35,10 +36,11 @@ def draw_label(im, label, x, y):
                 cv2.LINE_AA)
 
 
-def pre_process(input_image, net):
+async def pre_process(input_image, net, output_layers):
     """
     This function run the inference in the image with the models.
 
+    :param output_layers:
     :param input_image:
     :param net:
     :return: output raw predictions
@@ -52,11 +54,11 @@ def pre_process(input_image, net):
     # Sets the input to the network.
     net.setInput(blob)
     # Run the forward pass to get output of the output layers.
-    outputs = net.forward(net.getUnconnectedOutLayersNames())
+    outputs = await asyncio.get_running_loop().run_in_executor(None, net.forward, output_layers)
     return outputs
 
 
-def post_process(input_image, outputs, classes):
+async def post_process(input_image, outputs, classes):
     """
     This function post process the predictions, it discards redundant and bad detections,
      then draw the boxes and labels, finally, at last save results in cache.
@@ -124,7 +126,7 @@ def post_process(input_image, outputs, classes):
 
 
 # Serving model
-async def inference(net, frame, classes):
+async def inference(net, frame, classes, output_layers):
     """
     This function should process the frame taken two arguments, net who is the model and image, so with this predict
     the objects inside.
@@ -136,8 +138,8 @@ async def inference(net, frame, classes):
     """
     # -----------------------------------------------------------
     # Process Image.
-    detections = pre_process(frame, net)
-    img = post_process(frame.copy(), detections, classes)
+    detections = await pre_process(frame, net, output_layers)
+    img = await post_process(frame.copy(), detections, classes)
     # Get performance about each object predicted and show it inside.
     t, _ = net.getPerfProfile()
     label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())

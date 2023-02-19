@@ -25,7 +25,7 @@ async def video_stream():
 
 
 async def get_image():
-    cap = cv2.VideoCapture("/home/stylorj/PycharmProjects/JUGO/icneaproject/icnea/28Nov.webm")
+    cap = cv2.VideoCapture("28Nov.webm")
     model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
     classesfile = config.CLASSES_PATH
     with open(classesfile, 'rt') as f:
@@ -34,13 +34,17 @@ async def get_image():
     net = cv2.dnn.readNetFromONNX(model)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+    output_layers = net.getUnconnectedOutLayersNames()
     while True:
         ret, frame = cap.read()
         # output = await inference.inference(net, frame, classes)
 
         if ret:
-            task = asyncio.create_task(inference.inference(net, frame, classes))
+            ini = time.time()
+            task = asyncio.create_task(inference.inference(net, frame, classes, output_layers))
             output = await task
+            fin = time.time()
+            print(fin - ini)
             if output is None:
                 continue
             (flag, encodedImage) = cv2.imencode(".jpg", output)
