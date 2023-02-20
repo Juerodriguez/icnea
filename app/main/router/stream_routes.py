@@ -25,7 +25,7 @@ async def video_stream():
 
 
 async def get_image():
-    cap = cv2.VideoCapture("/home/stylorj/PycharmProjects/JUGO/icneaproject/icnea/28Nov.webm")
+    cap = cv2.VideoCapture("28Nov.webm")
     model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
     classesfile = config.CLASSES_PATH
     with open(classesfile, 'rt') as f:
