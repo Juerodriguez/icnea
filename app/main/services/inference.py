@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 from ..config import Settings
 from ..schemas.prediction_schema import Frame, Coordinate, Prediction
-from ..services.redis_client import save_cache
+from ..services.redis_client import save_cache, delete_all_cache
+from ..utils.timer_utils import start_timer, finish_timer
 import time
 
 settings = Settings()
@@ -44,6 +45,8 @@ def pre_process(input_image, net):
     :return: output raw predictions
     """
     # Create a 4D blob from a frame.
+
+    input_image = cv2.resize(input_image, (640, 640))
     blob = cv2.dnn.blobFromImage(input_image, 1 / 255,
                                  (settings.OPENCVCONFIG.CONSTANTS.INPUT_WIDTH,
                                   settings.OPENCVCONFIG.CONSTANTS.INPUT_HEIGHT),
@@ -51,6 +54,7 @@ def pre_process(input_image, net):
 
     # Sets the input to the network.
     net.setInput(blob)
+
     # Run the forward pass to get output of the output layers.
     outputs = net.forward(net.getUnconnectedOutLayersNames())
     return outputs
@@ -96,6 +100,7 @@ def post_process(input_image, outputs, classes):
                 height = int(h * y_factor)
                 box = np.array([left, top, width, height])
                 boxes.append(box)
+
 # Perform non maximum suppression to eliminate redundant, overlapping boxes with lower confidences.
     indices = cv2.dnn.NMSBoxes(boxes, confidences,
                                settings.OPENCVCONFIG.CONSTANTS.CONFIDENCE_THRESHOLD,
@@ -119,7 +124,24 @@ def post_process(input_image, outputs, classes):
         coordinate = Coordinate(left=left, top=top, width=width, height=height)
         singular_frame = Frame(coordinate=coordinate, label=label)
         frame.append(singular_frame.dict())
-    save_cache(Prediction(frame=frame))
+
+    if timer1:
+        timer_limit_start_save = start_timer(30)
+        timer1 = False
+        #delete_all_cache()
+    if finish_timer(timer_limit_start_save):
+        if timer2:
+            timer_limit_end_save = start_timer(10)
+            timer2 = False
+            delete_all_cache()
+        save_cache(Prediction(frame=frame))
+        status_redis = "Guardado en proceso..."
+
+        if finish_timer(timer_limit_end_save):
+            timer1, timer2 = True
+            status_redis = "Datos de Inferencias cargados"
+
+
     return input_image
 
 
