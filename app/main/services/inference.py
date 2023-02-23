@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from typing import List
+
 from ..config import Settings
 from ..schemas.prediction_schema import Frame, Coordinate, Prediction
 from ..services.redis_client import save_cache, delete_all_cache
@@ -60,11 +62,12 @@ def pre_process(input_image, net):
     return outputs
 
 
-def post_process(input_image, outputs, classes):
+def post_process(input_image, outputs, classes: List[str], timer: dict):
     """
     This function post process the predictions, it discards redundant and bad detections,
      then draw the boxes and labels, finally, at last save results in cache.
 
+    :param timer:
     :param input_image:
     :param outputs:
     :param classes:
@@ -125,32 +128,33 @@ def post_process(input_image, outputs, classes):
         singular_frame = Frame(coordinate=coordinate, label=label)
         frame.append(singular_frame.dict())
 
-    if timer1:
-        timer_limit_start_save = start_timer(30)
-        timer1 = False
-        #delete_all_cache()
-    if finish_timer(timer_limit_start_save):
-        if timer2:
-            timer_limit_end_save = start_timer(10)
-            timer2 = False
+    if timer["timer1"]:
+        timer["timer_limit_start_save"] = start_timer(30)
+        timer["timer1"] = False
+    if finish_timer(timer["timer_limit_start_save"]):
+        if timer["timer2"]:
+            timer["timer_limit_end_save"] = start_timer(10)
+            timer["timer2"] = False
             delete_all_cache()
         save_cache(Prediction(frame=frame))
         status_redis = "Guardado en proceso..."
+        print(status_redis)
 
-        if finish_timer(timer_limit_end_save):
-            timer1, timer2 = True
-            status_redis = "Datos de Inferencias cargados"
-
+        if finish_timer(timer["timer_limit_end_save"]):
+            timer["timer1"], timer["timer2"] = True
+            status_redis = "Guardado finalizado"
+            print(status_redis)
 
     return input_image
 
 
 # Serving model
-async def inference(net, frame, classes):
+async def inference(net, frame, classes: List[str], timer: dict):
     """
     This function should process the frame taken two arguments, net who is the model and image, so with this predict
     the objects inside.
 
+    :param timer:
     :param net:
     :param frame:
     :param classes:
@@ -159,7 +163,7 @@ async def inference(net, frame, classes):
     # -----------------------------------------------------------
     # Process Image.
     detections = pre_process(frame, net)
-    img = post_process(frame.copy(), detections, classes)
+    img = post_process(frame.copy(), detections, classes, timer)
     # Get performance about each object predicted and show it inside.
     t, _ = net.getPerfProfile()
     label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())

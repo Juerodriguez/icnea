@@ -6,6 +6,7 @@ from ..config import Settings
 from fastapi.templating import Jinja2Templates
 import time
 import asyncio
+from ..utils.timer_utils import start_timer
 
 config = Settings()
 router = APIRouter(prefix="/stream", tags=["Video Stream"])
@@ -41,6 +42,12 @@ async def get_image():
 
     :return:
     """
+    timer = {
+        "timer1": True,
+        "timer2": True,
+        "timer_limit_start_save": start_timer(100),
+        "timer_limit_end_save": start_timer(100),
+    }
     cap = cv2.VideoCapture("M.mp4")
     model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
     classesfile = config.CLASSES_PATH
@@ -56,7 +63,7 @@ async def get_image():
 
         if ret:
 
-            task = asyncio.create_task(inference.inference(net, frame, classes))
+            task = asyncio.create_task(inference.inference(net, frame, classes, timer))
             output = await task
             if output is None:
                 continue
