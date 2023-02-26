@@ -48,7 +48,7 @@ async def get_image():
         "timer_limit_start_save": start_timer(100),
         "timer_limit_end_save": start_timer(100),
     }
-    cap = cv2.VideoCapture("M.mp4")
+    cap = cv2.VideoCapture("M.mp4") #udp://192.168.1.49:8080
     model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
     classesfile = config.CLASSES_PATH
     with open(classesfile, 'rt') as f: # Obtener las clases al predecir

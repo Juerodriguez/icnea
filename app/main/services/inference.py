@@ -128,22 +128,24 @@ def post_process(input_image, outputs, classes: List[str], timer: dict):
         singular_frame = Frame(coordinate=coordinate, label=label)
         frame.append(singular_frame.dict())
 
-    if timer["timer1"]:
-        timer["timer_limit_start_save"] = start_timer(30)
-        timer["timer1"] = False
-    if finish_timer(timer["timer_limit_start_save"]):
-        if timer["timer2"]:
-            timer["timer_limit_end_save"] = start_timer(10)
-            timer["timer2"] = False
-            delete_all_cache()
-        save_cache(Prediction(frame=frame))
-        status_redis = "Guardado en proceso..."
-        print(status_redis)
-
-        if finish_timer(timer["timer_limit_end_save"]):
-            timer["timer1"], timer["timer2"] = True
-            status_redis = "Guardado finalizado"
+        if timer["timer1"]:
+            timer["timer_limit_start_save"] = start_timer(30)
+            timer["timer1"] = False
+        if finish_timer(timer["timer_limit_start_save"]):
+            if timer["timer2"]:
+                timer["timer_limit_end_save"] = start_timer(10)
+                timer["timer2"] = False
+                delete_all_cache()
+            save_cache(Prediction(frame=frame))
+            status_redis = "Guardado en proceso..."
             print(status_redis)
+
+            if finish_timer(timer["timer_limit_end_save"]):
+                timer["timer1"] = True
+                timer["timer2"] = True
+                status_redis = "Guardado finalizado"
+                print(status_redis)
+
 
     return input_image
 
