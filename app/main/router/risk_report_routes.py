@@ -10,33 +10,35 @@ router_detect = APIRouter(prefix="/detections", tags=["Detections report"])
 templates = Jinja2Templates(directory=config.TEMPLATE_PATH)
 
 
-@router_detect.get("/get_all")
+@router_detect.get("/get_report")
 async def detections_report_get():
     """
     This endpoint serves for produce a report with the presence of objects and their correct position.
     :return:
     """
-    if get_status_data:
-        response = redis_client.get_all_cache()
-    else:
-        response = {
-            "message": status
+    data = redis_client.get_all_cache()
+    if data:
+        datos = {
+            "Coping": False,
+            "saw": False,
+            "Drill": False,
+            "Hammer": False,
+            "Pliers": False,
+            "Scissors": False,
+            "Screwdriver": False,
+            "Spanner": False,
+
         }
 
-    data = {
-        "Coping": False,
-        "saw": False,
-        "Drill": False,
-        "Hammer": False,
-        "Pliers": False,
-        "Scissors": False,
-        "Screwdriver": False,
-        "Spanner": False,
+    else:
+        data = {
+            "message": "No se detectaron objetos"
+        }
 
-    }
-    for key in data.keys():
+
+    """for key in data.keys():
         if len(response[key]) > len(num_frames / 2):
-            data[key] = True
+            data[key] = True"""
 
     return data
 

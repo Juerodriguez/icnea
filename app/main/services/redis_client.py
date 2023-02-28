@@ -17,7 +17,8 @@ def save_cache(data: Prediction) -> str:
 
 def delete_all_cache() -> str:
     try:
-        keys_iter = (redis_client.delete(key) for key in redis_client.keys())
+        # keys_iter = (redis_client.delete(key) for key in redis_client.keys())
+        redis_client.flushall()
         return "Borrado con exito"
     except ResponseError as e:
         print(e)
@@ -25,7 +26,7 @@ def delete_all_cache() -> str:
 
 def get_all_cache() -> iter:
     try:
-        keys_iter = (json.loads(redis_client.get(key)) for key in redis_client.keys())
+        keys_iter = [json.loads(redis_client.get(key)) for key in redis_client.keys()]
         return keys_iter
     except ResponseError as e:
         print(e)
