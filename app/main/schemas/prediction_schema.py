@@ -24,3 +24,6 @@ class Prediction(BaseModel):
     frame: List[Frame]
 
 
+class FramesCount(BaseModel):
+    id: str = Field(default_factory=generate_uuid)
+    frames_count: int = 0

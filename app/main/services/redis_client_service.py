@@ -1,13 +1,14 @@
 import json
 import redis
+from typing import Union
 from redis.exceptions import ResponseError
-from ..schemas.prediction_schema import Prediction
+from ..schemas.prediction_schema import Prediction, FramesCount
 
 
 redis_client = redis.Redis(host="redis", port=6379)
 
 
-def save_cache(data: Prediction) -> str:
+def save_cache(data: Union[Prediction, FramesCount]) -> str:
     try:
         redis_client.set(data.dict()["id"], json.dumps(data.dict()))
         return "Guardado con exito"

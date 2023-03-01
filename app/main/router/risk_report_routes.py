@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from ..services import redis_client
+from ..services import redis_client_service
 from ..config import Settings
 from fastapi.templating import Jinja2Templates
 import time
@@ -16,8 +16,10 @@ async def detections_report_get():
     This endpoint serves for produce a report with the presence of objects and their correct position.
     :return:
     """
-    data = redis_client.get_all_cache()
+    data = redis_client_service.get_all_cache()
     if data:
+        presence_object(data)
+
         datos = {
             "Coping": False,
             "saw": False,

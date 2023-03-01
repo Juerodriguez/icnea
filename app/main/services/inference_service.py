@@ -5,7 +5,7 @@ from typing import List
 from ..config import Settings
 from ..schemas.prediction_schema import Frame, Coordinate, Prediction
 from ..schemas.timer_schema import Timer
-from ..services.redis_client import save_cache, delete_all_cache
+from ..services.redis_client_service import save_cache, delete_all_cache
 from ..utils.timer_utils import start_timer, finish_timer
 import time
 
@@ -125,9 +125,6 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer):
         label = "{}:{:.2f}".format(classes[class_ids[i]], confidences[i])
         # Draw label.
         draw_label(input_image, label, left, top)
-        coordinate = Coordinate(left=left, top=top, width=width, height=height)
-        singular_frame = Frame(coordinate=coordinate, label=label)
-        frame.append(singular_frame.dict())
 
         if timer.flag1:
             timer.timer_limit_start_save = start_timer(30)
@@ -137,10 +134,16 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer):
                 timer.timer_limit_end_save = start_timer(10)
                 timer.flag2 = False
                 delete_all_cache()
-            save_cache(Prediction(frame=frame))
+            coordinate = Coordinate(left=left, top=top, width=width, height=height)
+            singular_frame = Frame(coordinate=coordinate, label=label)
+            frame.append(singular_frame.dict())  # todo limpiar el diccionario
             result_timer_trigger = "Guardado en proceso..."
 
             if finish_timer(timer.timer_limit_end_save):
+                save_cache(Prediction(frame=frame))  # todo probar si funciona fuera del timer para sabe si se appenean todas las predicciones en los 10 segundos ademas de las appeneadas antes
+                                                     # de ser asi se estarian cargando todas las predicciones appeneadas durante los 40s
+                                                     # ver bien como se guardan los datos
+                                                     # todo por ultimo modificar la carga con el nuevo dict
                 timer.flag1 = True
                 timer.flag2 = True
                 result_timer_trigger = "Guardado finalizado"
