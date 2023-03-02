@@ -63,11 +63,11 @@ python val.py --weights runs/train/<n° de experimento>/weights/best.pt --data d
 
 ```
 
-Por ultimo, cuando tengamos nuestro mejor modelo entrenado lo transformaremos en el formato ONNX para asi poder utilizarlo en la inferencia.
+10- Por ultimo, cuando tengamos nuestro mejor modelo entrenado lo transformaremos en el formato ONNX para asi poder utilizarlo en la inferencia.
 Esto lo haremos con el script export.py
 
 ```bash
-python export.py --weights runs/<n° de experimento>/weights/best.pt --include onnx
+python export.py --weights runs/<nombre del experimento>/weights/best.pt --include onnx --opset 12
 ```
 
 ## Manejando docker
