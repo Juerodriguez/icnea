@@ -18,7 +18,7 @@ async def detections_report_get():
     """
     data = redis_client_service.get_all_cache()
     if data:
-        presence_object(data)
+        #presence_object(data)
 
         datos = {
             "Coping": False,
