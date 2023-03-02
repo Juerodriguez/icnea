@@ -70,8 +70,7 @@ async def get_image():
                 timer2.flag1 = False
             if finish_timer(timer2.timer_limit_start_save):
                 timer2.flag1 = True
-                redis_client_service.save_cache(FramesCount(frame_count=num_frames)) #todo probar guardo mostrando resultado en api
-                print(num_frames)  # todo print solo para pruebas
+                redis_client_service.save_cache(FramesCount(frames_count=num_frames)) #todo probar guardo mostrando resultado en api
                 num_frames = 0
 
             task = asyncio.create_task(inference_service.inference(net, frame, classes, timer1))
