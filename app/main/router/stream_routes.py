@@ -53,9 +53,9 @@ async def get_image():
         classes = f.read().rstrip('\n').split('\n')
 
     net = cv2.dnn.readNetFromONNX(model)
-    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)  # Seleccionar cuda para inferir en GPU
-    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-    cap = cv2.VideoCapture("M.mp4")  # udp://192.168.1.49:8080?overrun_nonfatal
+    #net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)  # Seleccionar cuda para inferir en GPU
+    #net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+    cap = cv2.VideoCapture("tools_test.mp4")  # udp://192.168.1.49:8080?overrun_nonfatal
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     while True:
         ret, frame = cap.read()
