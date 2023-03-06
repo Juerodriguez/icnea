@@ -7,6 +7,6 @@ def start_timer(seconds: int) -> float:
     return time_limit
 
 
-def finish_timer(time_limit: int) -> bool:
+def finish_timer(time_limit: float) -> bool:
     return time.time() >= time_limit
 
