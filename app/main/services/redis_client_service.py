@@ -10,7 +10,10 @@ redis_client = redis.Redis(host="redis", port=6379)
 
 def save_cache(data: Union[Prediction, FramesCount]) -> str:
     try:
-        redis_client.set(data.dict()["id"], json.dumps(data.dict()))
+        if "frame" in data.dict():
+            redis_client.set(data.dict()["id"], json.dumps(data.dict()))
+        else:
+            redis_client.set(data.dict()["id"], json.dumps(data.dict()))
         return "Guardado con exito"
     except ResponseError as e:
         print(e)

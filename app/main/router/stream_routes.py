@@ -47,6 +47,7 @@ async def get_image():
     timer1 = Timer()
     timer2 = Timer()
     num_frames = 0
+    frames_to_redis = []
     redis_client_service.delete_all_cache()
     model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
     classesfile = config.CLASSES_PATH
@@ -73,7 +74,7 @@ async def get_image():
                 redis_client_service.save_cache(FramesCount(frames_count=num_frames)) #todo probar guardo mostrando resultado en api
                 num_frames = 0
 
-            task = asyncio.create_task(inference_service.inference(net, frame, classes, timer1))
+            task = asyncio.create_task(inference_service.inference(net, frame, classes, timer1, frames_to_redis))
             output = await task
             if output is None:
                 continue
