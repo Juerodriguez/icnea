@@ -49,34 +49,39 @@ async def get_image():
     num_frames = 0
     frames_to_redis = []
     redis_client_service.delete_all_cache()
-    model = f"{config.MODEL_PATH}/best.onnx"  # Cambiar al nombre del modelo que quiere probar
+    model = f"{config.MODEL_PATH}/best_yolov8s.onnx"  # Cambiar al nombre del modelo que quiere probar
     classesfile = config.CLASSES_PATH
     with open(classesfile, 'rt') as f: # Obtener las clases al predecir
         classes = f.read().rstrip('\n').split('\n')
-
+    # Read the Net model
     net = cv2.dnn.readNetFromONNX(model)
-    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)  # Seleccionar cuda para inferir en GPU
+    # Set CUDA Backend
+    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-    cap = cv2.VideoCapture("M.mp4")  # udp://192.168.1.49:8080?overrun_nonfatal
+
+    # Get video
+    cap = cv2.VideoCapture("video_desk.mp4")  # udp://192.168.1.49:8080?overrun_nonfatal
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     while True:
         ret, frame = cap.read()
 
-        # output = await inference.inference(net, frame, classes)
-
         if ret:
+            # Save the number of frames each 10 seconds
             num_frames += 1
             if timer2.flag1:
                 timer2.timer_limit_start_save = start_timer(10)
                 timer2.flag1 = False
             if finish_timer(timer2.timer_limit_start_save):
                 timer2.flag1 = True
-                redis_client_service.save_cache(FramesCount(frames_count=num_frames)) #todo probar guardo mostrando resultado en api
+                redis_client_service.save_cache(FramesCount(frames_count=num_frames))
                 num_frames = 0
+            # Call the inference service to object detection
 
             task = asyncio.create_task(inference_service.inference(net, frame, classes, timer1, frames_to_redis))
             output = await task
+
             if output is None:
                 continue
+            # Encode the frame to stream it.
             (flag, encodedImage) = cv2.imencode(".jpg", output)
             yield b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n'

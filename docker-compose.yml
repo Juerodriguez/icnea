@@ -1,8 +1,8 @@
-version: "3"
+version: "3.7"
 services:
-  api:
+  api.opencv4.7:
     build: .
-    container_name: icnea-server_2.0
+    container_name: icnea-server_3.0
     command: uvicorn run:app --host 0.0.0.0 --port 80 --reload
     deploy:
       resources:

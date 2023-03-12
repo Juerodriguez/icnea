@@ -7,7 +7,6 @@ from ..schemas.prediction_schema import Frame, Coordinate, Prediction
 from ..schemas.timer_schema import Timer
 from ..services.redis_client_service import save_cache, delete_all_cache
 from ..utils.timer_utils import start_timer, finish_timer
-import time
 
 settings = Settings()
 
@@ -59,7 +58,7 @@ def pre_process(input_image, net):
     net.setInput(blob)
 
     # Run the forward pass to get output of the output layers.
-    outputs = net.forward(net.getUnconnectedOutLayersNames())
+    outputs = net.forward()
     return outputs
 
 
@@ -76,56 +75,43 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
     """
     # Lists to hold respective values while unwrapping.
     class_ids = []
-    confidences = []
     boxes = []
+    scores = []
+    input_image = cv2.resize(input_image, (640, 640))
+    [height, width, _] = input_image.shape
+    length = max((height, width))
+    scale = length / 640
     # Rows.
-    rows = outputs[0].shape[1]
-    image_height, image_width = input_image.shape[:2]
-    # Resizing factor.
-    x_factor = image_width / settings.OPENCVCONFIG.CONSTANTS.INPUT_WIDTH
-    y_factor = image_height / settings.OPENCVCONFIG.CONSTANTS.INPUT_HEIGHT
+    outputs = np.array([cv2.transpose(outputs[0])])
+    rows = outputs.shape[1]
+
     # Iterate through detections.
-    for r in range(rows):
-        row = outputs[0][0][r]
-        confidence = row[4]
-        # Discard bad detections and continue.
-        if confidence >= settings.OPENCVCONFIG.CONSTANTS.CONFIDENCE_THRESHOLD:
-            classes_scores = row[5:]
-            # Get the index of max class score.
-            class_id = np.argmax(classes_scores)
-            #  Continue if the class score is above threshold.
-            if classes_scores[class_id] > settings.OPENCVCONFIG.CONSTANTS.SCORE_THRESHOLD:
-                confidences.append(confidence)
-                class_ids.append(class_id)
-                cx, cy, w, h = row[0], row[1], row[2], row[3]
-                left = int((cx - w / 2) * x_factor)
-                top = int((cy - h / 2) * y_factor)
-                width = int(w * x_factor)
-                height = int(h * y_factor)
-                box = np.array([left, top, width, height])
-                boxes.append(box)
+    for i in range(rows):
+        classes_scores = outputs[0][i][4:]
+        (minScore, maxScore, minClassLoc, (x, maxClassIndex)) = cv2.minMaxLoc(classes_scores)
+        if maxScore >= 0.40:
+            box = [
+                outputs[0][i][0] - (0.5 * outputs[0][i][2]), outputs[0][i][1] - (0.5 * outputs[0][i][3]),
+                outputs[0][i][2], outputs[0][i][3]]
+            boxes.append(box)
+            scores.append(maxScore)
+            class_ids.append(maxClassIndex)
+
+    result_boxes = cv2.dnn.NMSBoxes(boxes, scores, 0.25, 0.45, 0.5)
 
 # Perform non maximum suppression to eliminate redundant, overlapping boxes with lower confidences.
-    indices = cv2.dnn.NMSBoxes(boxes, confidences,
-                               settings.OPENCVCONFIG.CONSTANTS.CONFIDENCE_THRESHOLD,
-                               settings.OPENCVCONFIG.CONSTANTS.NMS_THRESHOLD)
-
-    for i in indices:
-        box = boxes[i]
-        left = box[0]
-        top = box[1]
-        width = box[2]
-        height = box[3]
-
-        # Draw bounding box.
-        cv2.rectangle(input_image, (left, top), (left + width, top + height),
+    detections = []
+    for i in range(len(result_boxes)):
+        index = result_boxes[i]
+        box = boxes[index]
+        cv2.rectangle(input_image, (round(box[0] ), round(box[1] )),
+                      (round((box[0] + box[2]) ), round((box[1] + box[3]) )),
                       settings.OPENCVCONFIG.COLORS.BLUE,
-                      3*settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS)
-        # Class label.
-        label = "{}:{:.2f}".format(classes[class_ids[i]], confidences[i])
-        # Draw label.
-        draw_label(input_image, label, left, top)
+                      3 * settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS)
+        label = "{}:{:.2f}".format(classes[class_ids[i]], scores[index])
+        draw_label(input_image, label, round(box[0] * scale), round(box[1] * scale))
 
+        # Save predictions to Redis
         if timer.flag1:
             timer.timer_limit_start_save = start_timer(30)
             timer.flag1 = False
@@ -134,7 +120,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
                 timer.timer_limit_end_save = start_timer(10)
                 timer.flag2 = False
                 delete_all_cache()
-            coordinate = Coordinate(left=left, top=top, width=width, height=height)
+            coordinate = Coordinate(left=box[0], top=box[1], width=box[2], height=box[3])
             singular_frame = Frame(coordinate=coordinate, label=classes[class_ids[i]])
             frames_to_redis.append(singular_frame.dict())
 
@@ -157,6 +143,7 @@ async def inference(net, frame, classes: List[str], timer: Timer, frames_to_redi
     This function should process the frame taken two arguments, net who is the model and image, so with this predict
     the objects inside.
 
+    :param frames_to_redis:
     :param timer:
     :param net:
     :param frame:
