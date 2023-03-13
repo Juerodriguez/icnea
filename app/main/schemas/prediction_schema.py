@@ -20,7 +20,7 @@ class Frame(BaseModel):
 
 
 class Prediction(BaseModel):
-    id: str = Field(default_factory=generate_uuid)
+    id: str = "prediction"
     frame: List[Frame]
 
 

@@ -24,12 +24,34 @@ async def detections_report_get():
         classes_response = {"message": "No se detectaron objetos"}
     return classes_response
 
+@router_detect.get("/calibrate_ready")
+async def calibrate_ready():
+    """
 
-@router_detect.post("/calibrate")
+    :return:
+    """
+    data = redis_client_service.get_all_cache()
+    for dicts in data:
+        if "frame" in dicts:
+            return {"message": "Listo para calibrar"}
+
+@router_detect.get("/calibrate")
 async def calibrate_position_objects():
     """
     This endpoint is for calibrate the object position, the coordinate results will be a reference position to determine
     the correct order of objects.
     :return:
     """
-    pass
+    data = redis_client_service.get_all_cache()
+    is_present = presence_service.presence(data)
+    labels = set([key for key, value in is_present.items() if value])
+    frames_to_redis = []
+    for dicts in data:
+        if "frame" in dicts:
+            frames = dicts["frame"]
+            for frame in frames:
+                if frame["label"] in labels:
+                    labels.discard(frame["label"])
+                    frames_to_redis.append(frame)
+    redis_client_service.save_cache_persistent(Prediction(frame=frames_to_redis))
+

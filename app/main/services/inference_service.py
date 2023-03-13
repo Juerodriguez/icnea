@@ -100,7 +100,6 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
     result_boxes = cv2.dnn.NMSBoxes(boxes, scores, 0.25, 0.45, 0.5)
 
 # Perform non maximum suppression to eliminate redundant, overlapping boxes with lower confidences.
-    detections = []
     for i in range(len(result_boxes)):
         index = result_boxes[i]
         box = boxes[index]
@@ -119,7 +118,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
             if timer.flag2:
                 timer.timer_limit_end_save = start_timer(10)
                 timer.flag2 = False
-                delete_all_cache()
+                delete_all_cache(key="prediction")
             coordinate = Coordinate(left=box[0], top=box[1], width=box[2], height=box[3])
             singular_frame = Frame(coordinate=coordinate, label=classes[class_ids[i]])
             frames_to_redis.append(singular_frame.dict())
@@ -129,7 +128,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
             if finish_timer(timer.timer_limit_end_save):
                 save_cache(Prediction(
                     frame=frames_to_redis))
-                frames_to_redis = []
+                frames_to_redis.clear()
                 timer.flag1 = True
                 timer.flag2 = True
                 result_timer_trigger = "Guardado finalizado"

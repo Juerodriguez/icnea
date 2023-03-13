@@ -10,19 +10,15 @@ redis_client = redis.Redis(host="redis", port=6379)
 
 def save_cache(data: Union[Prediction, FramesCount]) -> str:
     try:
-        if "frame" in data.dict():
-            redis_client.set(data.dict()["id"], json.dumps(data.dict()))
-        else:
-            redis_client.set(data.dict()["id"], json.dumps(data.dict()))
+        redis_client.set(data.dict()["id"], json.dumps(data.dict()))
         return "Guardado con exito"
     except ResponseError as e:
         print(e)
 
 
-def delete_all_cache() -> str:
+def delete_all_cache(key) -> str:
     try:
-        # keys_iter = (redis_client.delete(key) for key in redis_client.keys())
-        redis_client.flushall()
+        redis_client.delete(key)
         return "Borrado con exito"
     except ResponseError as e:
         print(e)

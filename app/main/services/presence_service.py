@@ -3,6 +3,7 @@
 def presence(data):
 
     clases_count = {
+        "Box": 0,
         "Coping saw": 0,
         "Drill": 0,
         "Hammer": 0,
@@ -10,9 +11,11 @@ def presence(data):
         "Scissors": 0,
         "Screwdriver": 0,
         "Spanner": 0,
+        "Worker": 0
 
     }
     clases_response = {
+        "Box": False,
         "Coping saw": False,
         "Drill": False,
         "Hammer": False,
@@ -20,6 +23,7 @@ def presence(data):
         "Scissors": False,
         "Screwdriver": False,
         "Spanner": False,
+        "Worker": False
 
     }
 
