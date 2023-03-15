@@ -1,6 +1,6 @@
 
 
-def presence(data):
+def presence(data) -> dict:
 
     clases_count = {
         "Box": 0,

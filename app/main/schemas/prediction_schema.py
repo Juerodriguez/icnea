@@ -24,6 +24,11 @@ class Prediction(BaseModel):
     frame: List[Frame]
 
 
+class Calibration(BaseModel):
+    id: str = "calibration"
+    frame_calibration: List[Frame]
+
+
 class FramesCount(BaseModel):
     id: str = "frames"
     frames_count: int = 0
