@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from ..services import redis_client_service, presence_service
 from ..config import Settings
 from ..schemas.prediction_schema import Calibration
+from ..utils import labels_utils
 import time
 import asyncio
 
@@ -19,26 +20,55 @@ async def detections_report_get() -> JSONResponse:
     :return:
     """
     comparator_calibration = []
+    positions = 0
     data = redis_client_service.get_all_cache()
     is_present = {}
-    in_position = {}
+    in_position = labels_utils.create_dicts_from_labels()
+
+    for dicts in data:
+        if "frame" in dicts:
+            is_present = presence_service.presence(data)
+            labels = set([key for key, value in is_present.items() if value])
+            if not labels:
+                return JSONResponse(content={
+                    "presence": is_present,
+                    "position": in_position
+                    })
+        else:
+            JSONResponse(content={
+                    "message": "No hay detecciones"
+                    })
+
+    # Obtencion de frames de calibracion que sirven de referencia.
     for dicts in data:
         if "frame_calibration" in dicts:
             frames = dicts["frame_calibration"]
             for frame in frames:
                 comparator_calibration.append(frame["frame"])
-    comparator2 = await filter_one_frame_per_label(data)
-    if len(comparator_calibration) != len(comparator2):
+
+    # Obtencian de un frame por etiqueta en los datos de frames detectados
+    comparator_detection = await filter_one_frame_per_label(data)
+
+    # Comparacion entre las posiciones de los frames de calibracion con los detectados
+    if len(comparator_calibration) != len(comparator_detection):
         return JSONResponse(content={
             "message": "Se requiere calibracion"
         })
     else:
-        for i in range(len(comparator_calibration)):
-            for key in comparator_calibration[i]["coordinate"]:
-                range_max = comparator_calibration[i]["coordinate"][key] * 1.05
-                range_min = comparator_calibration[i]["coordinate"][key] * 0.95
-                if range_min <= comparator2[i]["coordinate"][key] <= range_max:
-                    pass
+        for labels1 in comparator_calibration:
+            for labels2 in comparator_detection:
+                if labels1["labels"] == labels2["labels"]:
+                    for key in labels1["coordinate"]:
+                        range_max = labels1["coordinate"][key] * 1.10
+                        range_min = labels1["coordinate"][key] * 0.90
+                        if range_min <= labels2["coordinate"][key] <= range_max:
+                            positions += 1
+                        else:
+                            in_position[labels1["labels"]] = False
+                            # break
+                    # Si se contabiliza 4 posiciones correctas (left, top, right, height) el objeto esta posicionado.
+                    if positions == 4:
+                        in_position[labels1["labels"]] = True
 
     return JSONResponse(content={
         "presence": is_present,

@@ -1,40 +1,19 @@
+from ..utils import labels_utils
 
 
 def presence(data) -> dict:
 
-    clases_count = {
-        "Box": 0,
-        "Coping saw": 0,
-        "Drill": 0,
-        "Hammer": 0,
-        "Pliers": 0,
-        "Scissors": 0,
-        "Screwdriver": 0,
-        "Spanner": 0,
-        "Worker": 0
-
-    }
-    clases_response = {
-        "Box": False,
-        "Coping saw": False,
-        "Drill": False,
-        "Hammer": False,
-        "Pliers": False,
-        "Scissors": False,
-        "Screwdriver": False,
-        "Spanner": False,
-        "Worker": False
-
-    }
+    classes_count: dict = labels_utils.create_dicts_from_labels()
+    classes_response: dict = labels_utils.create_dicts_from_labels()
 
     for dicts in data:
         if "frame" in dicts:
             frames = dicts["frame"]
             for frame in frames:
-                clases_count[frame["label"]] += 1
+                classes_count[frame["label"]] += 1
     for dicts in data:
         if "frames_count" in dicts:
-            for key in clases_count.keys():
-                if clases_count[key] >= int(dicts["frames_count"] / 2):
-                    clases_response[key] = True
-    return clases_response
+            for key in classes_count.keys():
+                if classes_count[key] >= int(dicts["frames_count"] / 2):
+                    classes_response[key] = True
+    return classes_response
