@@ -20,22 +20,24 @@ async def detections_report_get() -> JSONResponse:
     :return:
     """
     comparator_calibration = []
+
     positions = 0
     data = redis_client_service.get_all_cache()
     is_present = {}
     in_position = labels_utils.create_dicts_from_labels()
 
-    for dicts in data:
-        if "frame" in dicts:
-            is_present = presence_service.presence(data)
-            labels = set([key for key, value in is_present.items() if value])
-            if not labels:
-                return JSONResponse(content={
-                    "presence": is_present,
-                    "position": in_position
-                    })
-        else:
-            JSONResponse(content={
+    if data:
+        for dicts in data:
+            if "frame" in dicts:
+                is_present = presence_service.presence(data)
+                labels = set([key for key, value in is_present.items() if value])
+                if not labels:
+                    return JSONResponse(content={
+                        "presence": is_present,
+                        "position": in_position
+                        })
+    else:
+        return JSONResponse(content={
                     "message": "No hay detecciones"
                     })
 
@@ -44,11 +46,10 @@ async def detections_report_get() -> JSONResponse:
         if "frame_calibration" in dicts:
             frames = dicts["frame_calibration"]
             for frame in frames:
-                comparator_calibration.append(frame["frame"])
+                comparator_calibration.append(frame)
 
     # Obtencian de un frame por etiqueta en los datos de frames detectados
     comparator_detection = await filter_one_frame_per_label(data)
-
     # Comparacion entre las posiciones de los frames de calibracion con los detectados
     if len(comparator_calibration) != len(comparator_detection):
         return JSONResponse(content={
@@ -57,18 +58,18 @@ async def detections_report_get() -> JSONResponse:
     else:
         for labels1 in comparator_calibration:
             for labels2 in comparator_detection:
-                if labels1["labels"] == labels2["labels"]:
+                if labels1["label"] == labels2["label"]:
                     for key in labels1["coordinate"]:
-                        range_max = labels1["coordinate"][key] * 1.10
-                        range_min = labels1["coordinate"][key] * 0.90
+                        range_max = labels1["coordinate"][key] * 1.15
+                        range_min = labels1["coordinate"][key] * 0.85
                         if range_min <= labels2["coordinate"][key] <= range_max:
                             positions += 1
                         else:
-                            in_position[labels1["labels"]] = False
+                            in_position[labels1["label"]] = False
                             # break
                     # Si se contabiliza 4 posiciones correctas (left, top, right, height) el objeto esta posicionado.
                     if positions == 4:
-                        in_position[labels1["labels"]] = True
+                        in_position[labels1["label"]] = True
 
     return JSONResponse(content={
         "presence": is_present,

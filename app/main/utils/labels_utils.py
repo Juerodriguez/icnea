@@ -1,9 +1,10 @@
-#from ..config import Settings
-#config = Settings()
+from ..config import Settings
+
+config = Settings()
 
 
 def read_classes() -> list:
-    classesfile = "C:/Users/juan/PycharmProjects/icnea/icnea/classes.txt"  # TODO config.CLASSES_PATH
+    classesfile = config.CLASSES_PATH
     print(classesfile)
     with open(classesfile, 'rt') as f:  # Obtener las clases a predecir
         classes = f.read().rstrip('\n').split('\n')

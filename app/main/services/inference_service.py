@@ -97,7 +97,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
             scores.append(maxScore)
             class_ids.append(maxClassIndex)
 
-    result_boxes = cv2.dnn.NMSBoxes(boxes, scores, 0.25, 0.45, 0.5)
+    result_boxes = cv2.dnn.NMSBoxes(boxes, scores, 0.45, 0.5)
 
 # Perform non maximum suppression to eliminate redundant, overlapping boxes with lower confidences.
     for i in range(len(result_boxes)):
