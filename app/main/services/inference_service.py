@@ -107,7 +107,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
                       (round((box[0] + box[2]) ), round((box[1] + box[3]) )),
                       settings.OPENCVCONFIG.COLORS.BLUE,
                       3 * settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS)
-        label = "{}:{:.2f}".format(classes[class_ids[i]], scores[index])
+        label = "{}:{:.2f}".format(classes[class_ids[index]], scores[index])
         draw_label(input_image, label, round(box[0] * scale), round(box[1] * scale))
 
         # Save predictions to Redis
@@ -120,7 +120,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
                 timer.flag2 = False
                 delete_all_cache(key="prediction")
             coordinate = Coordinate(left=box[0], top=box[1], width=box[2], height=box[3])
-            singular_frame = Frame(coordinate=coordinate, label=classes[class_ids[i]])
+            singular_frame = Frame(coordinate=coordinate, label=classes[class_ids[index]])
             frames_to_redis.append(singular_frame.dict())
 
             result_timer_trigger = "Guardado en proceso..."
@@ -132,7 +132,9 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
                 timer.flag1 = True
                 timer.flag2 = True
                 result_timer_trigger = "Guardado finalizado"
-
+    class_ids.clear()
+    boxes.clear()
+    scores.clear()
     return input_image
 
 

@@ -20,4 +20,5 @@ services:
 
   redis:
     image: redis:alpine
+    restart: always
     command: ["redis-server" ,"--appendonly" ,"no" ,"--save" ,"" ]
