@@ -1,10 +1,6 @@
 Box
-Coping saw
 Drill
 Hammer
 Pliers
-Scissors
 Screwdriver
 Spanner
-Worker
-
