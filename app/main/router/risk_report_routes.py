@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter,status
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from ..services import redis_client_service, presence_service
 from ..config import Settings
 from ..schemas.prediction_schema import Calibration
 from ..utils import labels_utils
-import time
-import asyncio
+
 
 config = Settings()
 router_detect = APIRouter(prefix="/detections", tags=["Detections report"])
@@ -39,7 +38,7 @@ async def detections_report_get() -> JSONResponse:
     else:
         return JSONResponse(content={
                     "message": "No hay detecciones"
-                    })
+                    }, status_code=status.HTTP_204_NO_CONTENT)
 
     # Obtencion de frames de calibracion que sirven de referencia.
     for dicts in data:
@@ -54,7 +53,7 @@ async def detections_report_get() -> JSONResponse:
     if len(comparator_calibration) != len(comparator_detection):
         return JSONResponse(content={
             "message": "Se requiere calibracion"
-        })
+        }, status_code=status.HTTP_204_NO_CONTENT)
     else:
         for labels1 in comparator_calibration:
             for labels2 in comparator_detection:
@@ -74,7 +73,7 @@ async def detections_report_get() -> JSONResponse:
     return JSONResponse(content={
         "presence": is_present,
         "position": in_position
-    })
+    }, status_code=status.HTTP_200_OK)
 
 
 @router_detect.get("/calibrate_ready")
@@ -88,9 +87,9 @@ async def calibrate_ready() -> JSONResponse:
     for dicts in data:
         if "frame" in dicts:
             response = {"message": "Listo para calibrar"}
-            return JSONResponse(content=response)
+            return JSONResponse(content=response, status_code=status.HTTP_200_OK)
     response = {"message": "Faltan datos para calibrar"}
-    return JSONResponse(content=response, status_code=204)
+    return JSONResponse(content=response, status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router_detect.get("/calibrate")
@@ -102,16 +101,17 @@ async def calibrate_position_objects() -> JSONResponse:
     """
     data = redis_client_service.get_all_cache()
     for dicts in data:
+        # Si los datos de calibracion existen en la base de datos estos se deben eliminar para recalibrar.
         if "frame_calibration" in dicts:
             redis_client_service.delete_all_cache(key="calibration")
 
     frame_response = await filter_one_frame_per_label(data)
     if frame_response:
         redis_client_service.save_cache(Calibration(frame_calibration=frame_response))
-        return JSONResponse(content=frame_response)
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=frame_response)
     else:
         response = {"message": "Fallo la calibracion"}
-        return JSONResponse(content=response, status_code=304)
+        return JSONResponse(content=response, status_code=status.HTTP_304_NOT_MODIFIED)
 
 
 async def filter_one_frame_per_label(data) -> list:
