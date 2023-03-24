@@ -21,84 +21,55 @@ python3 split_data.py
 ```
 Este script divide los datos de images y labels en datos para el train y validation con una proporcion de 80/20
 
-3- Descargar la imagen de yolo-v5 para Docker:
+3- Descargar la imagen de yolo-v8 para Docker:
 
 ```bash
-sudo docker pull ultralytics/yolov5:v6.2 
+sudo docker pull ultralytics/ultralytics:latest 
 ```
 
 4- En la misma ruta del repositorio o directorio con los datos, crear el contenedor. Debe ser aqui por el comando PWD que lo creara donde este posicionada la linea de comando:
 
 ```bash
-sudo docker run --name icnea_yolov5 -it -v $PWD:/icnea --gpus all --shm-size=8gb ultralytics/yolov5:v6.2
+sudo docker run --name YOLOV8 -it -v $PWD:/shared_directory --gpus all --shm-size=8gb ultralytics/ultralytics:latest
 ```
-Gracias al comando "-v" se comparte el directorio con las etiquetas, con el contenedor de yolo-v5
+Gracias al comando "-v" se comparte el directorio con las etiquetas, con el contenedor de yolo-v8
 
-5- Mover el archivo data_tools.yaml al directorio de yolov5 dentro del contenedor en /usr/src/app/data
+5- Entrar en la carpeta compartida "/shared_directory" que se encuentra en la raíz del contenedor
 ```bash
-cd /icnea/
-cp data_tools.yaml /usr/src/app/data/
-```
-
-6- Descargar el premodelo que vas a entrenar desde https://github.com/ultralytics/yolov5#pretrained-checkpoints y luego colocarlo en la carpeta compartida con el contenedor docker creado.
-
-7- Mover el .pt descargado a la carpeta /usr/src/app/
-```bash
-cp <modelo a entrenar ej:yolov5m.pt> /usr/src/app/
+cd /shared_directory/
 ```
 
-8- Para iniciar el entrenamiento se usa el siguiente comando que tiene un batch de 8. Primero nos movemos a la carpeta donde está el .pt
-```bash
-cd /usr/src/app/
-```
-Luego ejecutamos el los siguientes comandos:
-```bash
-export CLEAR_OFFLINE_MODE=1
-python train.py --img 640 --batch 8 --epochs <cantidad de epochs ej:20> --data data/data_tools.yaml --weights <modelo a entrenar ej:yolov5m.pt> 
-```
+6- Descargar el premodelo que vas a entrenar desde "https://github.com/ultralytics/ultralytics" o en su defecto "https://github.com/ultralytics/assets/releases"; y luego colocarlo en la carpeta compartida con el contenedor docker creado (docker_yolov8). Links a la descarga directa de los modelos:
+"m": https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8m.pt
+"s": https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt
 
-9- Luego de entrenarlo Validarlo
+7- Para iniciar el entrenamiento se usa el siguiente comando:
 ```bash
-python val.py --weights runs/train/<n° de experimento>/weights/best.pt --data data/data_tools.yaml --batch 8 --img 640 --half
-
+yolo detect train model=yolov8s.pt data=data_tools.yaml batch=48 v5loader=True device=\'0,1\' augment=True cache=True
 ```
 
-10- Por ultimo, cuando tengamos nuestro mejor modelo entrenado lo transformaremos en el formato ONNX para asi poder utilizarlo en la inferencia.
-Esto lo haremos con el script export.py
-
+9- Luego de entrenarlo se debe verificar su correcta dectección mediante un testeo:
 ```bash
-python export.py --weights runs/<nombre del experimento>/weights/best.pt --include onnx --opset 12
+yolo predict task=detect model=/icnea/best40.onnx imgsz=640 source=/icnea/video_tools_all.mp4 save=True
+
+```
+NOTA: el video_tools_all.mp4 debe ser añadido a la carpeta compartida con el contenedor de YOLOV8.
+
+10- Por ultimo, cuando tengamos nuestro mejor modelo entrenado lo transformaremos en el formato ONNX para asi poder utilizarlo en la inferencia:
+```bash
+yolo export model=/icnea/train<n° de train>/weights/best.pt format=onnx opset=12
 ```
 
 ## Manejando docker
 
 Para iniciar un contenedor creado
 ```bash
-sudo docker start icnea_yolov5
+sudo docker start YOLOV8
 
 ```
 
 Luego ejecutar el docker y usar bash dentro del mismo
 ```bash
-sudo docker exec -it icnea_yolov5 bash
+sudo docker exec -it YOLOV8 bash
 
-```
-
-## Ejemplos de experimentos con distintos optimizadores
-
-Para lograr una comparación entre los distintos optimizadores ejecutar:
-
-Optimizador SGD (por defecto)
-```
-python train.py --img 640 --batch 8 --epochs 80 --data data/data_tools.yaml --weights yolov5m.pt --cache disk
-```
-
-Optimizador Adam
-```
-python train.py --img 640 --batch 8 --epochs 80 --optimizer Adam --data data/data_tools.yaml --weights yolov5m.pt --cache disk
-```
-
-Optimizador AdamW
-```
-python train.py --img 640 --batch 8 --epochs 80 --optimizer AdamW --data data/data_tools.yaml --weights yolov5m.pt --cache disk
 ```

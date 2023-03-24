@@ -49,7 +49,7 @@ async def get_image():
     num_frames = 0
     frames_to_redis = []
 
-    model = f"{config.MODEL_PATH}/best28v8s84.onnx"  # Cambiar al nombre del modelo que quiere probar
+    model = f"{config.MODEL_PATH}/best43v8s.onnx"  # Cambiar al nombre del modelo que quiere probar
     classesfile = config.CLASSES_PATH
     with open(classesfile, 'rt') as f: # Obtener las clases al predecir
         classes = f.read().rstrip('\n').split('\n')
@@ -60,7 +60,7 @@ async def get_image():
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
     # Get video
-    cap = cv2.VideoCapture("video_tools_all.mp4")  # udp://192.168.1.49:8080?overrun_nonfatal
+    cap = cv2.VideoCapture(0)  # udp://192.168.1.49:8080?overrun_nonfatal
     #cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     while True:
         ret, frame = cap.read()
