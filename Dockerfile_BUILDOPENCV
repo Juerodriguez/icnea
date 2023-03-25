@@ -1,0 +1,98 @@
+ARG CUDA="11.8.0"
+ARG UBUNTU="22.04"
+
+FROM nvidia/cuda:${CUDA}-cudnn8-devel-ubuntu${UBUNTU}
+
+ARG PYTHON="3.10"
+ARG OPENCV="4.7.0"
+ARG CUDA_ARCH_BIN="6.1 7.0 7.2 7.5"
+ARG CUDNN="ON"
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV PIP_ROOT_USER_ACTION=ignore
+
+# In Ubuntu 20.04, this installs Python 3.8
+# In Ubuntu 22.04, this installs Python 3.10
+# From: https://github.com/Devtography/python-cuda-docker/blob/master/Dockerfile
+RUN apt update \
+    && apt install -y --no-install-recommends python3 python3-pip python3-numpy python3-dev \
+    && ln -sf python3 /usr/bin/python \
+    && ln -sf pip3 /usr/bin/pip \
+    && pip install --upgrade pip \
+    && pip install wheel setuptools
+
+# Install OpenCV dependencies
+RUN apt update && apt install -y --no-install-recommends gcc-10 \
+    g++-10 \
+    build-essential \
+    ninja-build \
+    cmake \
+    wget \
+    unzip \
+    pkg-config \
+    yasm \
+    git \
+    ffmpeg \
+    checkinstall \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libxvidcore-dev x264 \
+    libx264-dev \
+    libfaac-dev \
+    libmp3lame-dev \
+    libtheora-dev \
+    libfaac-dev \
+    libmp3lame-dev \
+    libvorbis-dev \
+    libxine2-dev \
+    libv4l-dev \
+    v4l-utils
+
+# Download and build OpenCV with CUDA support
+# From: https://github.com/thecanadianroot/opencv-cuda-docker/blob/main/Dockerfile
+WORKDIR /tmp
+RUN wget -q https://github.com/opencv/opencv/archive/refs/tags/${OPENCV}.zip && unzip ${OPENCV}.zip && rm ${OPENCV}.zip
+RUN wget -q https://github.com/opencv/opencv_contrib/archive/refs/tags/${OPENCV}.zip && unzip ${OPENCV}.zip && rm ${OPENCV}.zip
+RUN mkdir opencv-${OPENCV}/build && \
+    cd opencv-${OPENCV}/build && \
+    cmake -GNinja -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D WITH_TBB=ON \
+    -D ENABLE_FAST_MATH=1 \
+    -D CUDA_FAST_MATH=1 \
+    -D WITH_CUBLAS=1 \
+    -D WITH_CUDA=ON \
+    -D BUILD_opencv_cudacodec=OFF \
+    -D WITH_V4L=ON \
+    -D WITH_QT=OFF \
+    -D WITH_OPENGL=ON \
+    -D WITH_GSTREAMER=ON \
+    -D WITH_ONNX=ON \
+    -D WITH_FFMPEG=ON \
+    -D OPENCV_GENERATE_PKGCONFIG=ON \
+    -D OPENCV_PC_FILE_NAME=opencv.pc \
+    -D OPENCV_ENABLE_NONFREE=ON \
+    -D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib-${OPENCV}/modules \
+    -D WITH_CUDNN=${CUDNN} \
+    -D OPENCV_DNN_CUDA=${CUDNN} \
+    -D BUILD_JAVA=OFF \
+    -D BUILD_opencv_python2=OFF \
+    -D BUILD_opencv_python3=ON \
+    -D BUILD_opencv_dnn=ON \
+    -D HAVE_opencv_python3=ON \
+    -D CUDA_ARCH_BIN=${CUDA_ARCH_BIN} \
+    -D PYTHON_DEFAULT_EXECUTABLE=/usr/bin/python \
+    -D PYTHON3_EXECUTABLE=/usr/bin/python \
+    -D PYTHON3_PACKAGES_PATH=/usr/local/lib/python${PYTHON}/dist-packages/ \
+    -D OPENCV_PYTHON3_INSTALL_PATH=/usr/local/lib/python${PYTHON}/dist-packages/ \
+    -D INSTALL_PYTHON_EXAMPLES=OFF \
+    -D INSTALL_C_EXAMPLES=OFF \
+    -D BUILD_EXAMPLES=OFF \
+    .. && \
+    ninja && \
+    ninja install && \
+    ldconfig

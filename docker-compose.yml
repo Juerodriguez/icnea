@@ -1,8 +1,8 @@
-version: "3"
+version: "3.7"
 services:
-  api:
+  api.opencv4.7:
     build: .
-    container_name: icnea-server_2.0
+    container_name: icnea-server_3.0
     command: uvicorn run:app --host 0.0.0.0 --port 80 --reload
     deploy:
       resources:
@@ -10,14 +10,19 @@ services:
           devices:
             - driver: nvidia
               capabilities: [ gpu ]
+    devices:
+      - /dev/video0:/dev/video0
     ports:
       - "80:80"
       - "8080:8080/udp"
     volumes:
       - .:/code
+    environment:
+      - ENABLE_MJPG_STREAMER=true
     depends_on:
       - redis
 
   redis:
     image: redis:alpine
+    restart: always
     command: ["redis-server" ,"--appendonly" ,"no" ,"--save" ,"" ]

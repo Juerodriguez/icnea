@@ -20,7 +20,15 @@ class Frame(BaseModel):
 
 
 class Prediction(BaseModel):
-    id: str = Field(default_factory=generate_uuid)
+    id: str = "prediction"
     frame: List[Frame]
 
 
+class Calibration(BaseModel):
+    id: str = "calibration"
+    frame_calibration: List[Frame]
+
+
+class FramesCount(BaseModel):
+    id: str = "frames"
+    frames_count: int = 0

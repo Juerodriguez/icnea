@@ -11,7 +11,7 @@ class Colors(BaseModel):
 
 class Text(BaseModel):
     FONT_FACE = cv2.FONT_HERSHEY_SIMPLEX
-    FONT_SCALE = 0.7
+    FONT_SCALE = 0.6
     THICKNESS = 1
 
 
