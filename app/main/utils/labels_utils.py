@@ -5,7 +5,6 @@ config = Settings()
 
 def read_classes() -> list:
     classesfile = config.CLASSES_PATH
-    print(classesfile)
     with open(classesfile, 'rt') as f:  # Obtener las clases a predecir
         classes = f.read().rstrip('\n').split('\n')
     return classes

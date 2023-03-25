@@ -103,11 +103,12 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
     for i in range(len(result_boxes)):
         index = result_boxes[i]
         box = boxes[index]
+        label = "{}:{:.2f}".format(classes[class_ids[index]], scores[index])
         cv2.rectangle(input_image, (round(box[0] ), round(box[1] )),
                       (round((box[0] + box[2]) ), round((box[1] + box[3]) )),
                       settings.OPENCVCONFIG.COLORS.BLUE,
                       3 * settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS)
-        label = "{}:{:.2f}".format(classes[class_ids[index]], scores[index])
+        
         draw_label(input_image, label, round(box[0] * scale), round(box[1] * scale))
 
         # Save predictions to Redis
@@ -135,6 +136,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
     class_ids.clear()
     boxes.clear()
     scores.clear()
+    # input_image = cv2.resize(input_image, (1080, 640))
     return input_image
 
 

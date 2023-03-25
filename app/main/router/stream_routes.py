@@ -29,7 +29,7 @@ async def read_root(request: Request):
 
 
 @router.get("/get_video", response_class=StreamingResponse)
-async def video_stream():
+async def video_stream() -> StreamingResponse:
     """
     This endpoint is for Stream the video inference results
 

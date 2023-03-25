@@ -35,10 +35,7 @@ async def detections_report_get() -> JSONResponse:
                         "presence": is_present,
                         "position": in_position
                         })
-    else:
-        return JSONResponse(content={
-                    "message": "No hay detecciones"
-                    }, status_code=status.HTTP_204_NO_CONTENT)
+            
 
     # Obtencion de frames de calibracion que sirven de referencia.
     for dicts in data:
@@ -50,25 +47,23 @@ async def detections_report_get() -> JSONResponse:
     # Obtencian de un frame por etiqueta en los datos de frames detectados
     comparator_detection = await filter_one_frame_per_label(data)
     # Comparacion entre las posiciones de los frames de calibracion con los detectados
-    if len(comparator_calibration) != len(comparator_detection):
-        return JSONResponse(content={
-            "message": "Se requiere calibracion"
-        }, status_code=status.HTTP_204_NO_CONTENT)
-    else:
-        for labels1 in comparator_calibration:
-            for labels2 in comparator_detection:
-                if labels1["label"] == labels2["label"]:
-                    for key in labels1["coordinate"]:
-                        range_max = labels1["coordinate"][key] * 1.15
-                        range_min = labels1["coordinate"][key] * 0.85
-                        if range_min <= labels2["coordinate"][key] <= range_max:
-                            positions += 1
-                        else:
-                            in_position[labels1["label"]] = False
-                            # break
-                    # Si se contabiliza 4 posiciones correctas (left, top, right, height) el objeto esta posicionado.
-                    if positions == 4:
-                        in_position[labels1["label"]] = True
+    
+    for labels1 in comparator_calibration:
+        for labels2 in comparator_detection:
+            if labels1["label"] == labels2["label"]:
+                positions = 0
+                for key in labels1["coordinate"]:
+                    range_max = labels1["coordinate"][key] * 1.20
+                    range_min = labels1["coordinate"][key] * 0.80
+                    if range_min <= labels2["coordinate"][key] <= range_max:
+                        positions += 1
+                    else:
+                        in_position[labels1["label"]] = False
+                        # break
+                # Si se contabiliza 4 posiciones correctas (left, top, right, height) el objeto esta posicionado.
+                if positions == 4:
+                    
+                    in_position[labels1["label"]] = True
 
     return JSONResponse(content={
         "presence": is_present,
