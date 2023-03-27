@@ -1,12 +1,16 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, WebSocket
 from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from ..services import redis_client_service, presence_service
 from ..config import Settings
-from ..schemas.prediction_schema import Calibration
-from ..utils import labels_utils
-
 
 config = Settings()
 router_main = APIRouter(prefix="/main", tags=["Principal page"])
 templates = Jinja2Templates(directory=config.TEMPLATE_PATH)
+
+@router_main.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("main.html", {
+        "request": request,
+        "message": "get_calibrate_ready()"
+    })

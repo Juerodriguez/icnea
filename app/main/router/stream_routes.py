@@ -11,11 +11,11 @@ from ..schemas.prediction_schema import FramesCount
 from ..utils.timer_utils import start_timer, finish_timer
 
 config = Settings()
-router = APIRouter(prefix="/stream", tags=["Video Stream"])
+router_stream = APIRouter(prefix="/stream", tags=["Video Stream"])
 templates = Jinja2Templates(directory=config.TEMPLATE_PATH)
 
 
-@router.get("/test")
+@router_stream.get("/test")
 async def read_root(request: Request):
     """
     Endpoint for test Stream result.
@@ -28,7 +28,7 @@ async def read_root(request: Request):
     })
 
 
-@router.get("/get_video", response_class=StreamingResponse)
+@router_stream.get("/get_video", response_class=StreamingResponse)
 async def video_stream() -> StreamingResponse:
     """
     This endpoint is for Stream the video inference results
