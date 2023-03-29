@@ -59,8 +59,13 @@ async def get_image():
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
-    # Get video
-    cap = cv2.VideoCapture(0)  # udp://192.168.1.49:8080?overrun_nonfatal
+    # -------- Get video --------
+    # Using webcam
+    #cap = cv2.VideoCapture(0)
+    # Using UDP
+    cap = cv2.VideoCapture("udp://192.168.0.101:8080?overrun_nonfatal")
+    # Using RSTP
+    
     #cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     while True:
         ret, frame = cap.read()
@@ -69,7 +74,7 @@ async def get_image():
             # Save the number of frames each 10 seconds
             num_frames += 1
             if timer2.flag1:
-                timer2.timer_limit_start_save = start_timer(10)
+                timer2.timer_limit_start_save = start_timer(5)
                 timer2.flag1 = False
             if finish_timer(timer2.timer_limit_start_save):
                 timer2.flag1 = True

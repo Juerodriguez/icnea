@@ -10,17 +10,17 @@ services:
           devices:
             - driver: nvidia
               capabilities: [ gpu ]
-    devices:
-      - /dev/video0:/dev/video0
     ports:
       - "80:80"
       - "8080:8080/udp"
     volumes:
       - .:/code
-    environment:
-      - ENABLE_MJPG_STREAMER=true
     depends_on:
       - redis
+    devices:
+      - /dev/video0:/dev/video0
+    environment:
+      - ENABLE_MJPG_STREAMER=true
 
   redis:
     image: redis:alpine
