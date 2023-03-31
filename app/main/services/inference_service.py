@@ -119,7 +119,6 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
             if timer.flag2:
                 timer.timer_limit_end_save = start_timer(10)
                 timer.flag2 = False
-                delete_all_cache(key="prediction")
             coordinate = Coordinate(left=box[0], top=box[1], width=box[2], height=box[3])
             singular_frame = Frame(coordinate=coordinate, label=classes[class_ids[index]])
             frames_to_redis.append(singular_frame.dict())
@@ -127,6 +126,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
             result_timer_trigger = "Guardado en proceso..."
 
             if finish_timer(timer.timer_limit_end_save):
+                delete_all_cache(key="prediction")
                 save_cache(Prediction(
                     frame=frames_to_redis))
                 frames_to_redis.clear()
@@ -157,10 +157,10 @@ async def inference(net, frame, classes: List[str], timer: Timer, frames_to_redi
     # Process Image.
     detections = pre_process(frame, net)
     img = post_process(frame.copy(), detections, classes, timer, frames_to_redis)
-    # Get performance about each object predicted and show it inside.
+    """    # Get performance about each object predicted and show it inside.
     t, _ = net.getPerfProfile()
     label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
     cv2.putText(img, label, (20, 40), settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_FACE,
                 settings.OPENCVCONFIG.TEXT_PARAMETERS.FONT_SCALE,
-                (0, 0, 255), settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS, cv2.LINE_AA)
+                (0, 0, 255), settings.OPENCVCONFIG.TEXT_PARAMETERS.THICKNESS, cv2.LINE_AA)"""
     return img

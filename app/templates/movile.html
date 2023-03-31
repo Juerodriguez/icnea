@@ -4,15 +4,15 @@
     <body>
         <div class="card">
             <div class="card-header">
-                <header>{% include 'header.html' %}</header>
+                <header>{% include 'movile/header.html' %}</header>
             </div>
             <div class="card-body">
-                <main>{% include 'main2.html' %}</main>
+                <main>{% include 'movile/main.html' %}</main>
             </div>
             <div class="card-footer text-muted">
-                <footer>{% include 'footer.html' %}</footer>
+                <footer>{% include 'movile/footer.html' %}</footer>
             </div>
         </div>
-        <script src="{{ url_for('public', path='/scripts/main.js') }}"></script>
     </body>
+    <script src="{{ url_for('public', path='/scripts/appMovile.js') }}"></script>
 </html>

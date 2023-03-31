@@ -23,7 +23,7 @@ async def read_root(request: Request):
     :param request:
     :return:
     """
-    return templates.TemplateResponse("index.html", {
+    return templates.TemplateResponse("video.html", {
         "request": request
     })
 
@@ -35,6 +35,7 @@ async def video_stream() -> StreamingResponse:
 
     :return:
     """
+    
     return StreamingResponse(get_image(), media_type="multipart/x-mixed-replace;boundary=frame")
 
 
@@ -61,12 +62,13 @@ async def get_image():
 
     # -------- Get video --------
     # Using webcam
-    #cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0)
     # Using UDP
-    cap = cv2.VideoCapture("udp://192.168.0.101:8080?overrun_nonfatal")
+    #cap = cv2.VideoCapture("udp://192.168.0.101:8080?overrun_nonfatal")
     # Using RSTP
     
-    #cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    # cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    
     while True:
         ret, frame = cap.read()
 
