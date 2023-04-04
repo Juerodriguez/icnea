@@ -17,10 +17,6 @@ services:
       - .:/code
     depends_on:
       - redis
-    devices:
-      - /dev/video0:/dev/video0
-    environment:
-      - ENABLE_MJPG_STREAMER=true
 
   redis:
     image: redis:alpine

@@ -2,7 +2,21 @@
 <html lang="es">
     <head>{% include 'head.html' %}</head>
     <body>
-        Bienvenido
+        <div class="card">
+            <div class="card-header">
+                <header>{% include 'movile/header.html' %}</header>
+            </div>
+            <div class="card-body">
+                <main>
+                    <form method="get">
+                        <input class="btn btn-primary" type="button" value="Comenzar" onclick="loadFrontend(this)">
+                    </form>
+                </main>
+            </div>
+            <div class="card-footer text-muted">
+                <footer>{% include 'desktop/footer.html' %}</footer>
+            </div>
+        </div>
     </body>
-    <script src="{{ url_for('public', path='/scripts/detectDevice.js') }}"></script>
+    <script src="{{ url_for('public', path='/scripts/appIndex.js') }}"></script>
 </html>
