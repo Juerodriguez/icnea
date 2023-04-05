@@ -113,7 +113,7 @@ def post_process(input_image, outputs, classes: List[str], timer: Timer, frames_
 
         # Save predictions to Redis
         if timer.flag1:
-            timer.timer_limit_start_save = start_timer(30)
+            timer.timer_limit_start_save = start_timer(10)
             timer.flag1 = False
         if finish_timer(timer.timer_limit_start_save):
             if timer.flag2:
