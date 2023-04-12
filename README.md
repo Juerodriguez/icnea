@@ -36,7 +36,7 @@ Para acceder a la documentación de los endpoints se debe acceder a la direcció
 
 - http://127.0.0.1/docs
 
-![endpoints.png](..%2F..%2F..%2F..%2FIm%C3%A1genes%2Fendpoints.png)
+![endpoints](https://user-images.githubusercontent.com/73370773/231500122-e8b7a4e4-e251-440a-9549-56a1e7ebf369.png)
 
 ## Sistema de Representacion de datos, Interfaz Web
 
