@@ -4,27 +4,43 @@
 Icnea como todo proyecto de ML esta compuesto por dos etapas, una etapa de entrenamiento donde se construye el
 modelo, y otra etapa de inferencia donde se pone a prueba el modelo
 
-## TRAINING UTILS
+## Sistema de modelado, TRAINING UTILS
 
-Para el entreamiento se eligio el algoritmo de YOLOv5, para el mismo se utilizara el repositorio de ultralitycs,
-el cual se usara en opcion dockerizada para evitar descargar las dependencias en nuestro entorno. Las intrucciones
-del mismo se encuentran en:
+Para el entreamiento se eligio el algoritmo de YOLOv8, para el mismo se utilizará el repositorio de ultralitycs,
+el cual se usara en opción dockerizada para evitar descargar las dependencias en nuestro entorno. Las intrucciones
+del mismo se encuentran en: 
+
+- https://github.com/Juerodriguez/icnea/tree/master/training_utils
 
 
-## INFERENCE APLICATION
+## Sistema de inferencia, Servidor 
 
-La aplicacion de inferencia fue desarrollada con FastApi devido a su grado de integracion con operacion asincronas.
+El sistema de inferencia fue desarrollada con FastApi devido a su grado de integracion con operacion asincronas y la facilidad de implementación de un API REST.
 
 ![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)
 
-Instalar los requerimientos
+
+
+Para levantar el servidor el sistema esta automatizado para esto se necesita tener instalado Docker junto a sus dependencias para integrarlo con CUDA.
+
+Para instalar las dependencias de CUDA para docker se debe ejecutar las instrucciones indicadas en training utils.
+
+
+Una vez instalado las dependencias de Docker se puede ejecutar docker compose con el siguiente comando:
+
 ```
-pip install -r requirements.txt
+docker compose up
 ```
 
-Correr el programa
-```
-uvicorn run:app --reload
-```
+Para acceder a la documentación de los endpoints se debe acceder a la dirección:
 
+- http://127.0.0.1/docs
+
+![endpoints.png](..%2F..%2F..%2F..%2FIm%C3%A1genes%2Fendpoints.png)
+
+## Sistema de Representacion de datos, Interfaz Web
+
+La interfaz web es servida en con el servidor de inferencia mediante Jinja2 un motor de plantilla, para acceder se debe entrar en la dirección.
+
+- "http://127.0.0.1/main"
 
