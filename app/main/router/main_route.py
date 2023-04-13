@@ -12,9 +12,9 @@ templates = Jinja2Templates(directory=config.TEMPLATE_PATH)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@router_main.get("/movile", response_class=HTMLResponse)
+@router_main.get("/mobile", response_class=HTMLResponse)
 async def homeMovile(request: Request):
-    return templates.TemplateResponse("movile.html", {"request": request})
+    return templates.TemplateResponse("mobile.html", {"request": request})
 
 @router_main.get("/desktop", response_class=HTMLResponse)
 async def homeDesktop(request: Request):

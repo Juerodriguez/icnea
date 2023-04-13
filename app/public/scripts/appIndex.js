@@ -4,7 +4,7 @@ function isMobileDevice() {
 
 function loadFrontend(e) {
     if (isMobileDevice()) {
-        window.location.replace(window.location.href + "movile");
+        window.location.replace(window.location.href + "mobile");
     } else {
         window.location.replace(window.location.href + "desktop");
     }
