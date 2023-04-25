@@ -8,13 +8,18 @@
             </div>
             <div class="card-body">
                 <main>
-                    <form method="get">
+                    <form id="center" method="get">
                         <input class="btn btn-primary" type="button" value="Comenzar" onclick="loadFrontend(this)">
                     </form>
+                    <style>
+                        #center {
+                          display: flex;
+                          justify-content: center;
+                          align-items: center;
+                          height: 70vh; /* altura del viewport */
+                        }
+                    </style>
                 </main>
-            </div>
-            <div class="card-footer text-muted">
-                <footer>{% include 'desktop/footer.html' %}</footer>
             </div>
         </div>
     </body>

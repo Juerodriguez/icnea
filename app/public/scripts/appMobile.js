@@ -44,17 +44,6 @@ function getReport() {
         
                 document.querySelector('.res_presences').innerHTML = liPresencesHtml + "</ul><br>";
                 document.querySelector('.res_positions').innerHTML = liPositionsHtml + "</ul>";
-
-            } else if (report_res.calibrateStatus == false) {
-
-                const htmlMsg = 
-                `<div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-                    <div style="padding-top: 60px; padding-bottom: 60px;">WARNING: se necesita calibración para visualizar</div>
-                </div>`
-
-                document.querySelector('.res_presences').innerHTML = htmlMsg
-                document.querySelector('.res_positions').innerHTML = htmlMsg
             }
         }
     }
