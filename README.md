@@ -1,6 +1,15 @@
 # ICNEA
 [![codecov](https://codecov.io/gh/Juerodriguez/icnea/branch/master/graph/badge.svg?token=CS77QAL0ZB)](https://codecov.io/gh/Juerodriguez/icnea)
 
+Icnea es un proyecto desarrollado para alcanzar la titulación en Ingenieria Mecatronica en la Universidad Nacional de La Rioja, consiste en la deteccion de herramientas en un tablero utilizado como maqueta de un entorno laboral, en el se debe detectar presencia de las herramientas y su correcto ordenamiento en la misma. Las herramientas a detectar son: 
+
+- Drill/Taladro.
+- Spanner/Llave.
+- Screwdriver/Destornillador.
+- Plier/Pinza.
+- Hammer/Martillo.
+- Box/Caja.
+
 Icnea como todo proyecto de ML esta compuesto por dos etapas, una etapa de entrenamiento donde se construye el
 modelo, y otra etapa de inferencia donde se pone a prueba el modelo
 
@@ -47,9 +56,9 @@ La interfaz web es servida en con el servidor de inferencia mediante Jinja2 un m
 ![Panel_control](https://user-images.githubusercontent.com/73370773/236558888-c7ac7ff4-0c97-4230-8d07-943d7357f9a1.png)
 
 
-## Contacto
+## Contacto de los autores
 
-Si quieres contribuir o simplemente aprender y tienes alguna duda puedes contactarnos a los siguientes correos:
+Si quieres contribuir, aprender o tienes alguna idea para desarrollar y tienes alguna duda puedes contactarnos a los siguientes correos:
 
 - rodriguezjuanelias19@gmail.com
 - gramajogonzalo@gmail.com
