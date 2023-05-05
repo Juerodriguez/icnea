@@ -44,3 +44,13 @@ La interfaz web es servida en con el servidor de inferencia mediante Jinja2 un m
 
 - "http://127.0.0.1/main"
 
+![Panel_control](https://user-images.githubusercontent.com/73370773/236558888-c7ac7ff4-0c97-4230-8d07-943d7357f9a1.png)
+
+
+## Contacto
+
+Si quieres contribuir o simplemente aprender y tienes alguna duda puedes contactarnos a los siguientes correos:
+
+- rodriguezjuanelias19@gmail.com
+- gramajogonzalo@gmail.com
+
