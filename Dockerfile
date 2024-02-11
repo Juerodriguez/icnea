@@ -1,4 +1,4 @@
-FROM cuda-cudnn-opencv:cuda11.8-cudnn8-opencv4.7.0-ubuntu22.04
+FROM juerodriguez/cuda-cudnn-opencv:cuda11.8-cudnn8-opencv4.7.0-ubuntu22.04
 
 WORKDIR /code
 
